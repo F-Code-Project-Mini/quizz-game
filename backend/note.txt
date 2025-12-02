@@ -1,0 +1,3 @@
+- npx prisma generate: chạy lại cấu trúc prisma client mỗi khi thay đổi schema
+- npx prisma db push: đồng bộ schema với db
+- npx prisma db seed: tạo data mẫu
