@@ -105,7 +105,7 @@ const HomePage = () => {
     }, []);
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-[url('https://img.freepik.com/free-psd/3d-rendering-questions-background_23-2151455632.jpg?semt=ais_hybrid&w=740&q=80')] bg-cover bg-center">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-[url('https://img.freepik.com/free-psd/3d-rendering-questions-background_23-2151455632.jpg?semt=ais_hybrid&w=740&q=80')] bg-cover bg-center py-4">
             <div className="mx-5 flex w-full max-w-2xl flex-col items-center rounded-xl bg-white p-6 pb-15 shadow-2xl">
                 <JoinRoomForm payload={{ value, infoRoom, setValues, handleInputChange, handleCheckRoom }} />
                 {isValidRoom && <InputInfoUser payload={{ value, setValues, handleInputChange, handleJoinRoom }} />}

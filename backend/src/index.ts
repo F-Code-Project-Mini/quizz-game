@@ -8,7 +8,7 @@ import "./configs/env";
 import roomRouter from "./routes/room.routes";
 import clubRouter from "./routes/club.routes";
 import { createServer } from "http";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import socketQuizz from "./sockets/quizz.socket";
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -34,7 +34,6 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// app.use("/auth", authRouter);
 app.use("/room", roomRouter);
 app.use("/club", clubRouter);
 app.use(defaultErrorHandler);

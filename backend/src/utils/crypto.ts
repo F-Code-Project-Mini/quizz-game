@@ -1,6 +1,5 @@
-import { createHash, createVerify } from "crypto";
 import bcrypt from "bcrypt";
-export default class AlgoCrypoto {
+export default class AlgoCrypto {
     static hashPassword = async (pwd: string) => {
         const password = await bcrypt.hashSync(pwd, 10);
         return password;

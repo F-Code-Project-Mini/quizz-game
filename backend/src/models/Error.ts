@@ -7,7 +7,6 @@ export type ErrorsType = Record<
 >;
 
 export class ErrorWithStatus {
-    // mặc định access modifier là: public
     message: string;
     status: number;
     constructor({ message, status }: { message: string; status: number }) {

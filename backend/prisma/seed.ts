@@ -1,13 +1,15 @@
 import { PrismaClient } from "@prisma/client";
-import Room from "../src/schemas/room.schema";
 import clubSeed from "./seeds/club.seed";
+import userSeed from "./seeds/user.seed";
 import roomSeed from "./seeds/room.seed";
+import questionSeed from "./seeds/question.seed";
 
 // 1. Khởi tạo Prisma Client
 const prisma = new PrismaClient();
 async function main() {
-    const promises = Promise.all([roomSeed(), clubSeed()]);
-    await promises;
+    await Promise.all([userSeed(), clubSeed()]);
+    await roomSeed();
+    await questionSeed();
 }
 main()
     .catch((e) => {

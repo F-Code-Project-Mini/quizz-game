@@ -1,11 +1,8 @@
 import { v7 as uuidv7 } from "uuid";
-//  id        String   @id @default(uuid()) @db.Char(36)
-//   code      String   @db.VarChar(100)
-//   name      String   @db.VarChar(255)
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
+
 interface RoomType {
     id?: string;
+    userId: string;
     code: string;
     name: string;
     status?: boolean;
@@ -15,6 +12,7 @@ interface RoomType {
 
 class Room {
     id: string;
+    userId: string;
     code: string;
     name: string;
     status: boolean;
@@ -22,6 +20,7 @@ class Room {
     updatedAt: Date;
     constructor(user: RoomType) {
         this.id = user.id || uuidv7();
+        this.userId = user.userId;
         this.code = user.code;
         this.name = user.name;
         this.status = user.status || false;
