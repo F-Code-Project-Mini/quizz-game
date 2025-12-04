@@ -10,6 +10,27 @@ Tài liệu này hướng dẫn chi tiết từng bước để người mới c
 
 ---
 
+## 0. Điều kiện tiên quyết
+
+Trước khi bắt đầu, hãy đảm bảo máy bạn đã cài:
+1. **Node.js**
+    * Khuyến nghị: Node.js phiên bản LTS (ví dụ: ≥ 18.x)
+    * Kiểm tra:
+        * `node -v`
+        * `npm -v`
+2. **Docker Desktop** (tích hợp sẵn Docker Engine + Docker Compose v2)
+    * [Tải](https://www.docker.com/get-started/) tại trang chủ Docker (chọn bản phù hợp Windows / macOS / Linux).
+    * Sau khi cài xong, mở Docker Desktop và đảm bảo nó đang chạy (không báo lỗi).
+
+3. **Git** (để clone source code)
+    * [Tải](https://git-scm.com/install/) và lựa chọn hệ điều hành phù hợp để cài đặt
+    * Kiểm tra: `git --version`
+
+Nếu các lệnh trên chạy được và báo phiên bản → bạn có thể tiếp tục.
+
+---
+
+
 ## 1. Clone dự án về máy
 
 Mở Terminal hoặc CMD và chạy các lệnh sau:
@@ -27,41 +48,34 @@ frontend/
 docker-compose.yml
 ```
 
----
+## 2. Khởi chạy Database/ các service liên quan khác bằng Docker
 
-## 2. Cài đặt Docker
-
-Dự án dùng Docker để chạy MySQL và phpMyAdmin.
-
-Nếu bạn chưa có Docker, tải và cài đặt tại:
-
-https://www.docker.com/products/docker-desktop/
-
-Cài đặt xong, mở Docker Desktop lên và đảm bảo Docker đang chạy.
-
----
-
-## 3. Khởi chạy Database bằng Docker
-
-Đứng trong thư mục quizz-game và chạy:
+Đứng trong thư mục **quizz-game** và chạy:
 
 ```
-docker-compose up -d
+docker compose up -d
 ```
 
 Lệnh này sẽ khởi động:
 - MySQL
 - phpMyAdmin
+- Redis
+- ... có thể cập nhật thêm trong tương lai
 
-Bạn có thể kiểm tra bằng:
+Bạn có thể kiểm tra các tiến trình đang chạy bằng:
 
 ```
 docker ps
 ```
 
+Ngoài ra nếu muốn dừng tất cả tiến trình đang chạy thì:
+```
+docker compose down
+```
+
 ---
 
-## 4. Truy cập phpMyAdmin để xem Database
+## 3. Truy cập phpMyAdmin để xem Database
 
 Mở trình duyệt và truy cập: http://localhost:8080
 
@@ -72,7 +86,7 @@ Password: **quizz_ps**
 
 ---
 
-## 5. Chạy phần Frontend
+## 4. Chạy phần Frontend
 
 Mở một cửa sổ terminal mới.
 
@@ -91,7 +105,7 @@ http://localhost:5173
 
 ---
 
-## 6. Chạy phần Backend
+## 5. Chạy phần Backend
 
 Mở thêm một terminal mới để chạy song song.
 
@@ -109,7 +123,7 @@ http://localhost:8000
 
 ---
 
-## 7. Migrate Database bằng Prisma
+## 6. Migrate Database bằng Prisma
 
 Backend dùng Prisma nên cần tạo bảng trong database.
 
@@ -121,7 +135,7 @@ npx prisma db push
 
 ---
 
-## 8. Seed dữ liệu mẫu
+## 7. Seed dữ liệu mẫu
 
 Sau khi migrate xong, chạy:
 
@@ -133,7 +147,7 @@ Lệnh này sẽ thêm dữ liệu mẫu giúp bạn test hệ thống ngay.
 
 ---
 
-## 9. Hoàn tất
+## 8. Hoàn tất
 
 Khi bạn đã chạy:
 
@@ -147,7 +161,7 @@ Khi bạn đã chạy:
 
 ---
 
-## 10. Một số lỗi thường gặp
+## 9. Một số lỗi thường gặp
 
 ### Backend không kết nối được database
 
@@ -162,8 +176,8 @@ Nếu sai, sửa lại rồi khởi chạy lại backend.
 Thử reset database:
 
 ```
-docker-compose down -v
-docker-compose up -d
+docker compose down -v
+docker compose up -d
 ```
 
 Sau đó chạy lại:
