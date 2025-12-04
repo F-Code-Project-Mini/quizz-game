@@ -11,7 +11,6 @@ const roomSeed = async () => {
                 userId: userId?.id || "",
                 code: "ROOMA",
                 name: "QUIZZ GAME GIẢI TRÍ CLB",
-                status: true,
             }),
         ],
     });

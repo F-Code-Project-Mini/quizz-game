@@ -1,11 +1,12 @@
 import { v7 as uuidv7 } from "uuid";
+import { IRoomStatus } from "../constants/enums";
 
 interface RoomType {
     id?: string;
     userId: string;
     code: string;
     name: string;
-    status?: boolean;
+    status?: IRoomStatus;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -15,7 +16,7 @@ class Room {
     userId: string;
     code: string;
     name: string;
-    status: boolean;
+    status: IRoomStatus;
     createdAt: Date;
     updatedAt: Date;
     constructor(user: RoomType) {
@@ -23,7 +24,7 @@ class Room {
         this.userId = user.userId;
         this.code = user.code;
         this.name = user.name;
-        this.status = user.status || false;
+        this.status = user.status || IRoomStatus.WAITING;
         this.createdAt = user.createdAt || new Date();
         this.updatedAt = user.updatedAt || new Date();
     }

@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  # Service Database MySQL
+  mysql:
+    image: mysql:8.0
+    container_name: quizz-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: quizz_ps   # Mật khẩu root
+      MYSQL_DATABASE: quizz_game          # Tên Database sẽ được tạo tự động
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # Service quản lý Database (Giao diện Web)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: quizz-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql         # Tên service mysql ở trên để kết nối
+      PMA_PORT: 3306
+    ports:
+      - "8080:80"             # Truy cập qua trình duyệt: http://localhost:8080
+    depends_on:
+      - mysql                 # Chờ mysql chạy xong mới chạy cái này
+
+  # Service Redis (Cache)
+  redis:
+    image: redis:7-alpine
+    container_name: quizz-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+volumes:
+  mysql_data:
