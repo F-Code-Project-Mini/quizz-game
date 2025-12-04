@@ -1,5 +1,4 @@
-import { v7 as uuidv7 } from "uuid";
-
+import { randomUUID } from "crypto";
 
 interface AnswerType {
     id?: string;
@@ -19,7 +18,7 @@ class Answer {
     updatedAt: Date;
 
     constructor(user: AnswerType) {
-        this.id = user.id || uuidv7();
+        this.id = user.id || randomUUID();
         this.questionId = user.questionId;
         this.answer = user.answer;
         this.isCorrect = user.isCorrect;

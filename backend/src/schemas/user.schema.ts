@@ -1,4 +1,4 @@
-import { v7 as uuidv7 } from "uuid";
+import { randomUUID } from "crypto";
 
 interface UserType {
     id?: string;
@@ -16,7 +16,7 @@ class User {
     updatedAt: Date;
 
     constructor(user: UserType) {
-        this.id = user.id || uuidv7();
+        this.id = user.id || randomUUID();
         this.username = user.username;
         this.password = user.password;
         this.createdAt = user.createdAt || new Date();

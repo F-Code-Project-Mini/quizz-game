@@ -1,5 +1,5 @@
-import { v7 as uuidv7 } from "uuid";
 import { IQuestionType } from "../constants/enums";
+import { randomUUID } from "crypto";
 
 interface QuestionType {
     id?: string;
@@ -25,7 +25,7 @@ class Question {
     updatedAt: Date;
 
     constructor(user: QuestionType) {
-        this.id = user.id || uuidv7();
+        this.id = user.id || randomUUID();
         this.roomId = user.roomId;
         this.question = user.question;
         this.score = user.score || 20;

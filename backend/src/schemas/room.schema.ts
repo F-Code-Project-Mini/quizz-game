@@ -1,4 +1,5 @@
-import { v7 as uuidv7 } from "uuid";
+
+import { randomUUID } from "crypto";
 import { IRoomStatus } from "../constants/enums";
 
 interface RoomType {
@@ -20,7 +21,7 @@ class Room {
     createdAt: Date;
     updatedAt: Date;
     constructor(user: RoomType) {
-        this.id = user.id || uuidv7();
+        this.id = user.id || randomUUID();
         this.userId = user.userId;
         this.code = user.code;
         this.name = user.name;

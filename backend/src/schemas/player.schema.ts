@@ -1,4 +1,4 @@
-import { v7 as uuidv7 } from "uuid";
+import { randomUUID } from "crypto";
 
 interface PlayerType {
     id: string;
@@ -19,7 +19,7 @@ class Player {
     endAt: Date;
     updatedAt: Date;
     constructor(user: PlayerType) {
-        this.id = user.id || uuidv7();
+        this.id = user.id || randomUUID();
         this.fullName = user.fullName;
         this.clubId = user.clubId;
         this.score = user.score || 0;

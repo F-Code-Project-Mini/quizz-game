@@ -1,5 +1,4 @@
 import { Server, Socket } from "socket.io";
-import prisma from "~/configs/prisma";
 interface IJoinGame {
     roomCode: string;
     fullName: string;
