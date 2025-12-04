@@ -11,7 +11,7 @@ export default defineConfig([
         files: ["**/*.{ts,tsx}"],
         extends: [
             js.configs.recommended,
-            ...tseslint.configs.recommended, // nên spread ra
+            ...tseslint.configs.recommended,
             reactHooks.configs.flat.recommended,
             reactRefresh.configs.vite,
         ],
@@ -23,8 +23,8 @@ export default defineConfig([
             "@typescript-eslint/no-unused-vars": [
                 "warn",
                 {
-                    argsIgnorePattern: "^", // param bắt đầu bằng _ sẽ không báo unused
-                    varsIgnorePattern: "^", // biến thường bắt đầu bằng _ cũng bỏ qua
+                    argsIgnorePattern: "^_", // param bắt đầu bằng _ sẽ không báo unused
+                    varsIgnorePattern: "^_", // biến thường bắt đầu bằng _ cũng bỏ qua
                     caughtErrorsIgnorePattern: "^_", // error trong catch (err) nếu đặt _err thì cũng bỏ qua
                 },
             ],

@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import prisma from "~/configs/prisma";
+import { IRoomStatus } from "~/constants/enums";
 import { HTTP_STATUS } from "~/constants/httpStatus";
 import { ErrorWithStatus } from "~/models/Error";
 import { IRequestJoinRoom } from "~/types/room.types";
@@ -8,7 +9,7 @@ export const checkRoomController = async (req: Request<{ room: string }>, res: R
     try {
         const { room } = req.params;
         const result = await prisma.room.findUnique({
-            where: { code: room, status: true },
+            where: { code: room },
         });
         if (!result) {
             throw new ErrorWithStatus({
@@ -34,7 +35,7 @@ export const handleJoinRoom = async (
         const { fullName, clubId } = req.body;
         const result = await Promise.all([
             prisma.room.findUnique({
-                where: { code: room, status: true },
+                where: { code: room },
             }),
             prisma.club.findUnique({
                 where: { id: clubId },
