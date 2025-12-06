@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import "./configs/env";
 import roomRouter from "./routes/room.routes";
 import clubRouter from "./routes/club.routes";
+import authRouter from "./routes/auth.routes";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import socketQuizz from "./sockets/quizz.socket";
@@ -34,8 +35,10 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use("/api/auth", authRouter);
 app.use("/room", roomRouter);
 app.use("/club", clubRouter);
+
 app.use(defaultErrorHandler);
 app.use(defaultSuccessHandler);
 httpServer.listen(PORT, () => {
