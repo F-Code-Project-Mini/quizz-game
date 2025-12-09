@@ -65,32 +65,38 @@ const ResultPage = ({
             )}
 
             {/* Main Content */}
-            <div className="relative z-10 flex min-h-screen items-center justify-center p-4">
+            <div className="relative z-10 flex min-h-screen items-center justify-center p-3 sm:p-4">
                 <div className="w-full max-w-2xl animate-scale-in">
                     {/* Medal & Rank */}
-                    <div className="mb-8 text-center">
-                        <div className="mb-4 text-9xl animate-bounce">{medal.emoji}</div>
-                        <h1 className={`mb-2 text-5xl font-black drop-shadow-lg ${medal.color}`}>{medal.label}</h1>
-                        <p className="text-2xl font-bold text-white">
+                    <div className="mb-6 sm:mb-8 text-center">
+                        <div className="mb-3 sm:mb-4 text-6xl sm:text-7xl md:text-9xl animate-bounce">
+                            {medal.emoji}
+                        </div>
+                        <h1
+                            className={`mb-2 text-3xl sm:text-4xl md:text-5xl font-black drop-shadow-lg ${medal.color}`}
+                        >
+                            {medal.label}
+                        </h1>
+                        <p className="text-lg sm:text-xl md:text-2xl font-bold text-white">
                             {rank} / {totalPlayers} người chơi
                         </p>
                     </div>
 
                     {/* Stats Card */}
-                    <div className="glass-effect-strong mb-6 rounded-3xl p-8 shadow-2xl">
+                    <div className="glass-effect-strong mb-4 sm:mb-6 rounded-2xl sm:rounded-3xl p-5 sm:p-6 md:p-8 shadow-2xl">
                         {/* Score */}
-                        <div className="mb-6 text-center">
-                            <div className="mb-2 flex items-center justify-center gap-3">
-                                <Trophy className="h-10 w-10 text-yellow-500" />
-                                <p className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+                        <div className="mb-5 sm:mb-6 text-center">
+                            <div className="mb-2 flex items-center justify-center gap-2 sm:gap-3">
+                                <Trophy className="h-8 w-8 sm:h-10 sm:w-10 text-yellow-500" />
+                                <p className="text-4xl sm:text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
                                     {score.toLocaleString()}
                                 </p>
                             </div>
-                            <p className="text-lg font-bold text-gray-600">Tổng điểm</p>
+                            <p className="text-base sm:text-lg font-bold text-gray-600">Tổng điểm</p>
                         </div>
 
                         {/* Stats Grid */}
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-3">
                             {/* Correct Answers */}
                             <div className="rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50 p-4 text-center">
                                 <div className="mb-2 flex justify-center">
@@ -130,19 +136,19 @@ const ResultPage = ({
                     <div className="flex flex-col gap-3 sm:flex-row">
                         <Button
                             size="lg"
-                            className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-lg font-bold shadow-glow-pink transition-smooth hover:scale-105 hover:from-purple-700 hover:to-pink-700"
+                            className="flex-1 h-11 sm:h-12 bg-gradient-to-r from-purple-600 to-pink-600 text-base sm:text-lg font-bold shadow-glow-pink transition-smooth hover:scale-105 hover:from-purple-700 hover:to-pink-700"
                             onClick={() => navigate("/")}
                         >
-                            <Home className="h-5 w-5" />
+                            <Home className="h-4 w-4 sm:h-5 sm:w-5" />
                             Về trang chủ
                         </Button>
                         <Button
                             size="lg"
                             variant="outline"
-                            className="flex-1 border-2 border-white bg-white/20 text-lg font-bold text-white backdrop-blur-sm transition-smooth hover:scale-105 hover:bg-white/30"
+                            className="flex-1 h-11 sm:h-12 border-2 border-white bg-white/20 text-base sm:text-lg font-bold text-white backdrop-blur-sm transition-smooth hover:scale-105 hover:bg-white/30"
                             onClick={() => window.location.reload()}
                         >
-                            <RotateCcw className="h-5 w-5" />
+                            <RotateCcw className="h-4 w-4 sm:h-5 sm:w-5" />
                             Chơi lại
                         </Button>
                     </div>

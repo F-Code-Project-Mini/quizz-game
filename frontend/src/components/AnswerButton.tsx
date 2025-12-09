@@ -40,37 +40,37 @@ const AnswerButton = ({
             onClick={onClick}
             disabled={disabled}
             className={`
-                group relative flex min-h-[120px] w-full items-center gap-4 rounded-2xl p-6 
+                group relative flex min-h-[80px] sm:min-h-[100px] md:min-h-[120px] w-full items-center gap-3 sm:gap-4 rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6
                 text-left text-white shadow-xl transition-all duration-300
                 ${colorClasses[color]}
-                ${isSelected ? "scale-105 ring-4 ring-white" : ""}
+                ${isSelected ? "scale-105 ring-2 sm:ring-4 ring-white" : ""}
                 ${disabled ? "cursor-not-allowed opacity-60" : "hover:scale-105"}
-                ${showResult && isCorrect ? "ring-4 ring-green-400" : ""}
-                ${showResult && !isCorrect && isSelected ? "ring-4 ring-red-400" : ""}
+                ${showResult && isCorrect ? "ring-2 sm:ring-4 ring-green-400" : ""}
+                ${showResult && !isCorrect && isSelected ? "ring-2 sm:ring-4 ring-red-400" : ""}
             `}
         >
             {/* Icon */}
             <div
-                className={`flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl ${iconBgColors[color]} shadow-lg`}
+                className={`flex h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 flex-shrink-0 items-center justify-center rounded-lg sm:rounded-xl ${iconBgColors[color]} shadow-lg`}
             >
-                {icon || <span className="text-3xl font-black">{answer.charAt(0)}</span>}
+                {icon || <span className="text-2xl sm:text-2xl md:text-3xl font-black">{answer.charAt(0)}</span>}
             </div>
 
             {/* Answer Text */}
-            <div className="flex-1">
-                <p className="text-xl font-bold leading-tight">{answer}</p>
+            <div className="flex-1 pr-8 sm:pr-10">
+                <p className="text-base sm:text-lg md:text-xl font-bold leading-tight">{answer}</p>
             </div>
 
             {/* Result Indicator */}
             {showResult && (
-                <div className="absolute right-4 top-4">
+                <div className="absolute right-3 sm:right-4 top-3 sm:top-4">
                     {isCorrect ? (
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500 shadow-lg">
-                            <Check className="h-6 w-6 text-white" />
+                        <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-green-500 shadow-lg">
+                            <Check className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
                         </div>
                     ) : isSelected ? (
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500 shadow-lg">
-                            <X className="h-6 w-6 text-white" />
+                        <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-red-500 shadow-lg">
+                            <X className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
                         </div>
                     ) : null}
                 </div>
@@ -78,7 +78,7 @@ const AnswerButton = ({
 
             {/* Hover Effect */}
             {!disabled && !showResult && (
-                <div className="absolute inset-0 rounded-2xl bg-white/0 transition-all group-hover:bg-white/10"></div>
+                <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-white/0 transition-all group-hover:bg-white/10"></div>
             )}
         </button>
     );

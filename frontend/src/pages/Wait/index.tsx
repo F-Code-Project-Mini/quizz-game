@@ -121,93 +121,103 @@ const WaitPage = () => {
                 </div>
 
                 {/* Main Content */}
-                <div className="relative z-10 flex min-h-screen items-center justify-center p-4">
+                <div className="relative z-10 flex min-h-screen items-center justify-center p-3 sm:p-4">
                     <div className="w-full max-w-5xl">
                         {/* Header Section */}
-                        <div className="mb-6 animate-slide-in-up text-center">
-                            <div className="mb-3 flex items-center justify-center gap-3">
-                                <Clock className="h-8 w-8 animate-pulse text-white" />
-                                <h1 className="text-4xl font-black text-white drop-shadow-lg">Phòng Chờ</h1>
+                        <div className="mb-4 sm:mb-6 animate-slide-in-up text-center">
+                            <div className="mb-2 sm:mb-3 flex items-center justify-center gap-2 sm:gap-3">
+                                <Clock className="h-6 w-6 sm:h-8 sm:w-8 animate-pulse text-white" />
+                                <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white drop-shadow-lg">
+                                    Phòng Chờ
+                                </h1>
                             </div>
-                            <p className="text-lg font-semibold text-white/90">Đang chờ người chơi khác{waitingDots}</p>
+                            <p className="text-sm sm:text-base md:text-lg font-semibold text-white/90">
+                                Đang chờ người chơi khác{waitingDots}
+                            </p>
 
                             {/* Room Code Display */}
-                            <div className="mx-auto mt-4 flex w-fit items-center gap-3 rounded-full bg-white px-6 py-3 shadow-2xl">
-                                <span className="text-sm font-bold text-gray-700">Mã phòng:</span>
-                                <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+                            <div className="mx-auto mt-3 sm:mt-4 flex w-fit items-center gap-2 sm:gap-3 rounded-full bg-white px-4 sm:px-6 py-2 sm:py-3 shadow-2xl">
+                                <span className="text-xs sm:text-sm font-bold text-gray-700">Mã phòng:</span>
+                                <span className="text-lg sm:text-xl md:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
                                     {info.room?.code}
                                 </span>
                                 <button
                                     onClick={handleCopyCode}
-                                    className="rounded-full bg-purple-100 p-2 transition-all hover:scale-110 hover:bg-purple-200"
+                                    className="rounded-full bg-purple-100 p-1.5 sm:p-2 transition-all hover:scale-110 hover:bg-purple-200"
                                 >
                                     {copied ? (
-                                        <CheckCircle2 className="h-5 w-5 text-green-600" />
+                                        <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
                                     ) : (
-                                        <Copy className="h-5 w-5 text-purple-600" />
+                                        <Copy className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
                                     )}
                                 </button>
                             </div>
                         </div>
 
-                        <div className="grid gap-4 lg:grid-cols-3">
+                        <div className="grid gap-3 sm:gap-4 lg:grid-cols-3">
                             {/* Left Panel - Your Info */}
                             <div className="lg:col-span-1 animate-slide-in-left">
-                                <div className="glass-effect-strong rounded-3xl p-6 shadow-2xl">
-                                    <div className="mb-4 flex items-center justify-between border-b-2 border-gray-200 pb-3">
+                                <div className="glass-effect-strong rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 shadow-2xl">
+                                    <div className="mb-3 sm:mb-4 flex items-center justify-between border-b-2 border-gray-200 pb-2 sm:pb-3">
                                         <div className="flex items-center gap-2">
-                                            <Trophy className="h-6 w-6 text-purple-600" />
-                                            <h2 className="text-lg font-black text-gray-800">Thông Tin Của Bạn</h2>
+                                            <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+                                            <h2 className="text-base sm:text-lg font-black text-gray-800">
+                                                Thông Tin Của Bạn
+                                            </h2>
                                         </div>
                                         <Button
                                             variant="destructive"
                                             size="icon-sm"
                                             onClick={handleLogout}
-                                            className="transition-smooth hover:scale-110"
+                                            className="transition-smooth hover:scale-110 h-8 w-8"
                                         >
-                                            <LogOut className="h-4 w-4" />
+                                            <LogOut className="h-3 w-3 sm:h-4 sm:w-4" />
                                         </Button>
                                     </div>
 
-                                    <div className="flex flex-col items-center space-y-4">
+                                    <div className="flex flex-col items-center space-y-3 sm:space-y-4">
                                         <div className="relative">
-                                            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-600 text-4xl font-black text-white shadow-2xl ring-4 ring-white">
+                                            <div className="flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-600 text-3xl sm:text-4xl font-black text-white shadow-2xl ring-2 sm:ring-4 ring-white">
                                                 {info.player?.fullName.charAt(0)?.toUpperCase() || "?"}
                                             </div>
-                                            <div className="absolute -bottom-1 -right-1 rounded-full bg-green-500 p-1 shadow-lg ring-4 ring-white">
-                                                <div className="h-3 w-3 rounded-full bg-white"></div>
+                                            <div className="absolute -bottom-1 -right-1 rounded-full bg-green-500 p-0.5 sm:p-1 shadow-lg ring-2 sm:ring-4 ring-white">
+                                                <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-full bg-white"></div>
                                             </div>
                                         </div>
 
                                         {/* Info */}
                                         <div className="text-center w-full">
-                                            <h3 className="text-xl font-black text-gray-800">
+                                            <h3 className="text-lg sm:text-xl font-black text-gray-800">
                                                 {info.player?.fullName || "Unknown"}
                                             </h3>
-                                            <p className="mt-2 rounded-full bg-gradient-to-r from-purple-100 to-pink-100 px-4 py-2 text-sm font-bold text-purple-700">
+                                            <p className="mt-1.5 sm:mt-2 rounded-full bg-gradient-to-r from-purple-100 to-pink-100 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-purple-700">
                                                 {info.club?.name || "No Club"}
                                             </p>
                                         </div>
 
                                         {/* Stats */}
-                                        <div className="w-full space-y-3 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 p-4">
+                                        <div className="w-full space-y-2 sm:space-y-3 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 p-3 sm:p-4">
                                             <div className="flex items-center justify-between">
-                                                <span className="text-sm font-bold text-gray-600">Trạng thái:</span>
+                                                <span className="text-xs sm:text-sm font-bold text-gray-600">
+                                                    Trạng thái:
+                                                </span>
                                                 {isConnected ? (
-                                                    <span className="flex items-center gap-2 text-sm font-black text-green-600">
-                                                        <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
+                                                    <span className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-black text-green-600">
+                                                        <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-green-500 animate-pulse"></div>
                                                         Đã kết nối
                                                     </span>
                                                 ) : (
-                                                    <span className="flex items-center gap-2 text-sm font-black text-red-600">
-                                                        <div className="h-2 w-2 rounded-full bg-red-500"></div>
+                                                    <span className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-black text-red-600">
+                                                        <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-red-500"></div>
                                                         Mất kết nối
                                                     </span>
                                                 )}
                                             </div>
                                             <div className="flex items-center justify-between">
-                                                <span className="text-sm font-bold text-gray-600">Điểm số:</span>
-                                                <span className="text-sm font-black text-purple-600">
+                                                <span className="text-xs sm:text-sm font-bold text-gray-600">
+                                                    Điểm số:
+                                                </span>
+                                                <span className="text-xs sm:text-sm font-black text-purple-600">
                                                     {info.player?.score || 0} 🏆
                                                 </span>
                                             </div>
@@ -218,22 +228,22 @@ const WaitPage = () => {
 
                             {/* Right Panel - Players List */}
                             <div className="lg:col-span-2 animate-slide-in-right">
-                                <div className="glass-effect-strong rounded-3xl p-6 shadow-2xl">
-                                    <div className="mb-4 flex items-center justify-between border-b-2 border-gray-200 pb-3">
+                                <div className="glass-effect-strong rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 shadow-2xl">
+                                    <div className="mb-3 sm:mb-4 flex items-center justify-between border-b-2 border-gray-200 pb-2 sm:pb-3">
                                         <div className="flex items-center gap-2">
-                                            <Users className="h-6 w-6 text-purple-600" />
-                                            <h2 className="text-lg font-black text-gray-800">
+                                            <Users className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+                                            <h2 className="text-base sm:text-lg font-black text-gray-800">
                                                 Thành viên khác trong CLB
                                             </h2>
                                         </div>
-                                        <span className="flex items-center gap-2 rounded-full bg-purple-100 px-4 py-2 text-sm font-black text-purple-700">
-                                            {Math.max(0, players.length - 1)} <User className="h-4 w-4" />
+                                        <span className="flex items-center gap-1.5 sm:gap-2 rounded-full bg-purple-100 px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-black text-purple-700">
+                                            {Math.max(0, players.length - 1)} <User className="h-3 w-3 sm:h-4 sm:w-4" />
                                         </span>
                                     </div>
 
                                     {/* Players Grid */}
-                                    <div className="max-h-96 overflow-y-auto pr-2">
-                                        <div className="grid gap-3 sm:grid-cols-2">
+                                    <div className="max-h-72 sm:max-h-96 overflow-y-auto pr-1 sm:pr-2">
+                                        <div className="grid gap-2 sm:gap-3 sm:grid-cols-2">
                                             {players.map((player, index) => {
                                                 if (player.playerId === info.player.id) {
                                                     return null;
@@ -241,22 +251,22 @@ const WaitPage = () => {
                                                 return (
                                                     <div
                                                         key={player.id}
-                                                        className="group overflow-hidden rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 p-4 transition-all hover:scale-105 hover:shadow-lg"
+                                                        className="group overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 p-3 sm:p-4 transition-all hover:scale-105 hover:shadow-lg"
                                                         style={{
                                                             animation: `fadeInUp 0.5s ease-out ${index * 0.1}s both`,
                                                         }}
                                                     >
-                                                        <div className="flex items-center gap-3">
+                                                        <div className="flex items-center gap-2 sm:gap-3">
                                                             {/* Player Avatar */}
                                                             <div className="flex-shrink-0">
-                                                                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-purple-400 to-pink-500 text-lg font-black text-white shadow-lg">
+                                                                <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-gradient-to-br from-purple-400 to-pink-500 text-base sm:text-lg font-black text-white shadow-lg">
                                                                     {player.fullName?.charAt(0)?.toUpperCase() || "?"}
                                                                 </div>
                                                             </div>
 
                                                             {/* Player Info */}
                                                             <div className="flex-1 overflow-hidden">
-                                                                <h3 className="truncate text-base font-black text-gray-800">
+                                                                <h3 className="truncate text-sm sm:text-base font-black text-gray-800">
                                                                     {player.fullName}
                                                                 </h3>
                                                                 <p className="text-xs font-semibold text-gray-600">
@@ -271,17 +281,17 @@ const WaitPage = () => {
                                     </div>
 
                                     {/* Loading Animation */}
-                                    <div className="mt-6 flex items-center justify-center gap-2">
+                                    <div className="mt-4 sm:mt-6 flex items-center justify-center gap-1.5 sm:gap-2">
                                         <div
-                                            className="h-3 w-3 animate-bounce rounded-full bg-purple-500"
+                                            className="h-2 w-2 sm:h-3 sm:w-3 animate-bounce rounded-full bg-purple-500"
                                             style={{ animationDelay: "0ms" }}
                                         ></div>
                                         <div
-                                            className="h-3 w-3 animate-bounce rounded-full bg-pink-500"
+                                            className="h-2 w-2 sm:h-3 sm:w-3 animate-bounce rounded-full bg-pink-500"
                                             style={{ animationDelay: "150ms" }}
                                         ></div>
                                         <div
-                                            className="h-3 w-3 animate-bounce rounded-full bg-yellow-500"
+                                            className="h-2 w-2 sm:h-3 sm:w-3 animate-bounce rounded-full bg-yellow-500"
                                             style={{ animationDelay: "300ms" }}
                                         ></div>
                                     </div>
@@ -290,8 +300,8 @@ const WaitPage = () => {
                         </div>
 
                         {/* Bottom Info */}
-                        <div className="mt-6 text-center animate-pulse-slow">
-                            <p className="text-base font-bold text-white drop-shadow-lg">
+                        <div className="mt-4 sm:mt-6 text-center animate-pulse-slow px-3">
+                            <p className="text-sm sm:text-base font-bold text-white drop-shadow-lg">
                                 💡 Trò chơi sẽ bắt đầu khi chủ phòng nhấn nút bắt đầu
                             </p>
                         </div>

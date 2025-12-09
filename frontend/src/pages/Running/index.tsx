@@ -92,13 +92,13 @@ const RunningPage = () => {
             <ScoreBoard score={score} streak={streak} correctAnswers={correctAnswers} totalQuestions={10} />
 
             {/* Main Content */}
-            <div className="relative z-10 flex min-h-screen flex-col items-center justify-center p-4">
+            <div className="relative z-10 flex min-h-screen flex-col items-center justify-center p-3 sm:p-4 pt-24 sm:pt-4">
                 <div className="w-full max-w-5xl">
                     {/* Quiz Question */}
                     <QuizCard question={mockQuiz.question} questionNumber={1} totalQuestions={10} timeLeft={timeLeft} />
 
                     {/* Answer Buttons */}
-                    <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="mt-4 sm:mt-6 md:mt-8 grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2">
                         {mockQuiz.answers.map((answer) => (
                             <AnswerButton
                                 key={answer.id}
@@ -116,22 +116,22 @@ const RunningPage = () => {
 
                     {/* Result Message */}
                     {showResult && (
-                        <div className="mt-6 animate-scale-in text-center">
+                        <div className="mt-4 sm:mt-6 animate-scale-in text-center">
                             {mockQuiz.answers.find((a) => a.id === selectedAnswer)?.isCorrect ? (
-                                <div className="glass-effect-strong rounded-2xl p-6">
-                                    <p className="text-3xl font-black text-green-600">
+                                <div className="glass-effect-strong rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                                    <p className="text-2xl sm:text-3xl font-black text-green-600">
                                         🎉 Chính xác! +{1000 + timeLeft * 10} điểm
                                     </p>
                                     {streak > 1 && (
-                                        <p className="mt-2 text-xl font-bold text-purple-600">
+                                        <p className="mt-2 text-lg sm:text-xl font-bold text-purple-600">
                                             🔥 Chuỗi {streak} câu đúng!
                                         </p>
                                     )}
                                 </div>
                             ) : (
-                                <div className="glass-effect-strong rounded-2xl p-6">
-                                    <p className="text-3xl font-black text-red-600">❌ Sai rồi!</p>
-                                    <p className="mt-2 text-xl font-bold text-gray-700">
+                                <div className="glass-effect-strong rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                                    <p className="text-2xl sm:text-3xl font-black text-red-600">❌ Sai rồi!</p>
+                                    <p className="mt-2 text-base sm:text-lg md:text-xl font-bold text-gray-700">
                                         Đáp án đúng: {mockQuiz.answers.find((a) => a.isCorrect)?.text}
                                     </p>
                                 </div>

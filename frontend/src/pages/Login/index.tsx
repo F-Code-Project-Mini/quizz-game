@@ -69,38 +69,46 @@ const LoginPage = () => {
             </div>
 
             {/* Content */}
-            <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-8">
+            <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-6 sm:py-8">
                 {/* Logo & Title */}
-                <div className="mb-8 animate-scale-in text-center">
-                    <div className="mb-4 flex justify-center">
-                        <div className="rounded-3xl bg-white p-4 shadow-2xl">
-                            <img src="/logo.svg" alt="Logo" className="h-20 w-20" />
+                <div className="mb-6 sm:mb-8 animate-scale-in text-center">
+                    <div className="mb-3 sm:mb-4 flex justify-center">
+                        <div className="rounded-2xl sm:rounded-3xl bg-white p-3 sm:p-4 shadow-2xl">
+                            <img src="/logo.svg" alt="Logo" className="h-14 w-14 sm:h-16 sm:w-16 md:h-20 md:w-20" />
                         </div>
                     </div>
-                    <h1 className="mb-2 text-5xl font-black text-white drop-shadow-lg">Đăng nhập</h1>
-                    <p className="text-xl font-semibold text-white/90">🔐 Quản lý Quiz Game</p>
+                    <h1 className="mb-2 text-3xl sm:text-4xl md:text-5xl font-black text-white drop-shadow-lg">
+                        Đăng nhập
+                    </h1>
+                    <p className="text-base sm:text-lg md:text-xl font-semibold text-white/90">🔐 Quản lý Quiz Game</p>
                 </div>
 
                 {/* Login Card */}
-                <div className="mx-auto w-full max-w-md animate-slide-in-up">
-                    <div className="glass-effect-strong rounded-3xl p-8 shadow-2xl">
-                        <form onSubmit={handleLogin} className="space-y-5">
+                <div className="mx-auto w-full max-w-2xl animate-slide-in-up">
+                    <div className="glass-effect-strong rounded-2xl sm:rounded-3xl p-5 sm:p-6 md:p-8 shadow-2xl">
+                        <form onSubmit={handleLogin} className="space-y-4 sm:space-y-5">
                             <div>
-                                <label htmlFor="username" className="mb-2 block text-sm font-bold text-gray-700">
+                                <label
+                                    htmlFor="username"
+                                    className="mb-1 sm:mb-2 block text-xs sm:text-sm font-bold text-gray-700"
+                                >
                                     Tên đăng nhập <span className="text-pink-500">*</span>
                                 </label>
                                 <Input
                                     id="username"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
-                                    className="h-12 border-2 border-gray-300 font-medium transition-all focus:border-purple-500 focus:ring-4 focus:ring-purple-200"
+                                    className="h-11 sm:h-12 border-2 border-gray-300 font-medium transition-all focus:border-purple-500 focus:ring-4 focus:ring-purple-200"
                                     placeholder="admin"
                                     required
                                 />
                             </div>
 
                             <div>
-                                <label htmlFor="password" className="mb-2 block text-sm font-bold text-gray-700">
+                                <label
+                                    htmlFor="password"
+                                    className="mb-1 sm:mb-2 block text-xs sm:text-sm font-bold text-gray-700"
+                                >
                                     Mật khẩu <span className="text-pink-500">*</span>
                                 </label>
                                 <Input
@@ -108,7 +116,7 @@ const LoginPage = () => {
                                     value={password}
                                     type="password"
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="h-12 border-2 border-gray-300 font-medium transition-all focus:border-purple-500 focus:ring-4 focus:ring-purple-200"
+                                    className="h-11 sm:h-12 border-2 border-gray-300 font-medium transition-all focus:border-purple-500 focus:ring-4 focus:ring-purple-200"
                                     placeholder="••••••••"
                                     required
                                 />
@@ -118,7 +126,7 @@ const LoginPage = () => {
                                 type="submit"
                                 variant="fuchsia"
                                 size="lg"
-                                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-lg font-bold shadow-glow-pink transition-smooth hover:scale-105 hover:from-purple-700 hover:to-pink-700"
+                                className="w-full h-11 sm:h-12 bg-gradient-to-r from-purple-600 to-pink-600 text-base sm:text-lg font-bold shadow-glow-pink transition-smooth hover:scale-105 hover:from-purple-700 hover:to-pink-700"
                                 disabled={isLoading}
                             >
                                 {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
