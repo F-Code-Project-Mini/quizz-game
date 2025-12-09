@@ -21,7 +21,7 @@ export enum IRoomStatus {
     FINISHED = "FINISHED",
 }
 export enum ExpiresInTokenType {
-    AccessToken = 2 * 60 * 60, // 2 giờ
+    AccessToken = 24 * 60 * 60, // 24 giờ
     RefreshToken = 30 * 24 * 60 * 60, // 30 ngày
     ForgotPasswordToken = 15 * 60, // 15 phút
     EmailVerifyToken = 7 * 24 * 60 * 60, // 7 ngày
