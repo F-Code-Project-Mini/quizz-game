@@ -54,42 +54,78 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-[url('https://img.freepik.com/free-psd/3d-rendering-questions-background_23-2151455632.jpg?semt=ais_hybrid&w=740&q=80')] bg-cover bg-center py-4">
-            <div className="w-full max-w-2xl p-8 bg-white rounded-xl">
-                <h2 className="text-3xl font-bold text-center text-purple-700 mb-6">Đăng nhập</h2>
+        <div className="relative min-h-screen overflow-hidden bg-gradient-game">
+            {/* Animated Background Elements */}
+            <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute -left-1/4 top-0 h-96 w-96 animate-float rounded-full bg-purple-500/20 blur-3xl"></div>
+                <div
+                    className="absolute -right-1/4 top-1/3 h-96 w-96 animate-float rounded-full bg-pink-500/20 blur-3xl"
+                    style={{ animationDelay: "1s" }}
+                ></div>
+                <div
+                    className="absolute bottom-0 left-1/3 h-96 w-96 animate-float rounded-full bg-yellow-500/20 blur-3xl"
+                    style={{ animationDelay: "2s" }}
+                ></div>
+            </div>
 
-                <div className="mb-4">
-                    <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
-                        Tên đăng nhập
-                    </label>
-                    <Input
-                        id="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        className="w-full border-gray-300 py-3 font-medium transition-all focus:ring-2 focus:ring-fuchsia-500"
-                        placeholder="Nhập tên đăng nhập"
-                        required
-                    />
+            {/* Content */}
+            <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-8">
+                {/* Logo & Title */}
+                <div className="mb-8 animate-scale-in text-center">
+                    <div className="mb-4 flex justify-center">
+                        <div className="rounded-3xl bg-white p-4 shadow-2xl">
+                            <img src="/logo.svg" alt="Logo" className="h-20 w-20" />
+                        </div>
+                    </div>
+                    <h1 className="mb-2 text-5xl font-black text-white drop-shadow-lg">Đăng nhập</h1>
+                    <p className="text-xl font-semibold text-white/90">🔐 Quản lý Quiz Game</p>
                 </div>
 
-                <div className="mb-6">
-                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                        Mật khẩu
-                    </label>
-                    <Input
-                        id="password"
-                        value={password}
-                        type="password"
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full border-gray-300 py-3 font-medium transition-all focus:ring-2 focus:ring-fuchsia-500"
-                        placeholder="Nhập mật khẩu"
-                        required
-                    />
-                </div>
+                {/* Login Card */}
+                <div className="mx-auto w-full max-w-md animate-slide-in-up">
+                    <div className="glass-effect-strong rounded-3xl p-8 shadow-2xl">
+                        <form onSubmit={handleLogin} className="space-y-5">
+                            <div>
+                                <label htmlFor="username" className="mb-2 block text-sm font-bold text-gray-700">
+                                    Tên đăng nhập <span className="text-pink-500">*</span>
+                                </label>
+                                <Input
+                                    id="username"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    className="h-12 border-2 border-gray-300 font-medium transition-all focus:border-purple-500 focus:ring-4 focus:ring-purple-200"
+                                    placeholder="admin"
+                                    required
+                                />
+                            </div>
 
-                <Button variant={"fuchsia"} className="w-full" disabled={isLoading} onClick={handleLogin}>
-                    Đăng nhập
-                </Button>
+                            <div>
+                                <label htmlFor="password" className="mb-2 block text-sm font-bold text-gray-700">
+                                    Mật khẩu <span className="text-pink-500">*</span>
+                                </label>
+                                <Input
+                                    id="password"
+                                    value={password}
+                                    type="password"
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="h-12 border-2 border-gray-300 font-medium transition-all focus:border-purple-500 focus:ring-4 focus:ring-purple-200"
+                                    placeholder="••••••••"
+                                    required
+                                />
+                            </div>
+
+                            <Button
+                                type="submit"
+                                variant="fuchsia"
+                                size="lg"
+                                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-lg font-bold shadow-glow-pink transition-smooth hover:scale-105 hover:from-purple-700 hover:to-pink-700"
+                                disabled={isLoading}
+                            >
+                                {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
+                            </Button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     );

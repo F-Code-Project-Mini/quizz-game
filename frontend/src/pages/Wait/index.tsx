@@ -106,183 +106,195 @@ const WaitPage = () => {
                 }}
             />
 
-            <div className="flex min-h-screen items-center justify-center bg-[url('https://img.freepik.com/free-psd/3d-rendering-questions-background_23-2151455632.jpg?semt=ais_hybrid&w=740&q=80')] bg-cover bg-center p-2 sm:p-4">
-                {/* Main Container */}
-                <div className="relative z-10 w-full max-w-5xl">
-                    {/* Header Section */}
-                    <div className="mb-3 text-center sm:mb-6">
-                        <div className="mb-2 flex items-center justify-center gap-2 sm:mb-3">
-                            <Clock className="h-5 w-5 animate-pulse text-gray-800 sm:h-7 sm:w-7" />
-                            <h1 className="text-2xl font-bold text-gray-800 sm:text-4xl">Phòng Chờ</h1>
+            <div className="relative min-h-screen overflow-hidden bg-gradient-game">
+                {/* Animated Background */}
+                <div className="absolute inset-0">
+                    <div className="absolute -left-1/4 top-0 h-96 w-96 animate-float rounded-full bg-purple-500/20 blur-3xl"></div>
+                    <div
+                        className="absolute -right-1/4 top-1/3 h-96 w-96 animate-float rounded-full bg-pink-500/20 blur-3xl"
+                        style={{ animationDelay: "1s" }}
+                    ></div>
+                    <div
+                        className="absolute bottom-0 left-1/3 h-96 w-96 animate-float rounded-full bg-yellow-500/20 blur-3xl"
+                        style={{ animationDelay: "2s" }}
+                    ></div>
+                </div>
+
+                {/* Main Content */}
+                <div className="relative z-10 flex min-h-screen items-center justify-center p-4">
+                    <div className="w-full max-w-5xl">
+                        {/* Header Section */}
+                        <div className="mb-6 animate-slide-in-up text-center">
+                            <div className="mb-3 flex items-center justify-center gap-3">
+                                <Clock className="h-8 w-8 animate-pulse text-white" />
+                                <h1 className="text-4xl font-black text-white drop-shadow-lg">Phòng Chờ</h1>
+                            </div>
+                            <p className="text-lg font-semibold text-white/90">Đang chờ người chơi khác{waitingDots}</p>
+
+                            {/* Room Code Display */}
+                            <div className="mx-auto mt-4 flex w-fit items-center gap-3 rounded-full bg-white px-6 py-3 shadow-2xl">
+                                <span className="text-sm font-bold text-gray-700">Mã phòng:</span>
+                                <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+                                    {info.room?.code}
+                                </span>
+                                <button
+                                    onClick={handleCopyCode}
+                                    className="rounded-full bg-purple-100 p-2 transition-all hover:scale-110 hover:bg-purple-200"
+                                >
+                                    {copied ? (
+                                        <CheckCircle2 className="h-5 w-5 text-green-600" />
+                                    ) : (
+                                        <Copy className="h-5 w-5 text-purple-600" />
+                                    )}
+                                </button>
+                            </div>
                         </div>
-                        <p className="text-sm font-medium text-gray-700 sm:text-lg">
-                            Đang chờ người chơi khác{waitingDots}
-                        </p>
 
-                        {/* Room Code Display */}
-                        <div className="mx-auto mt-2 flex w-fit items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 shadow-md backdrop-blur-sm sm:mt-4 sm:gap-3 sm:px-4 sm:py-2">
-                            <span className="text-xs font-semibold text-gray-700 sm:text-sm">Mã phòng:</span>
-                            <span className="text-sm font-bold text-fuchsia-600 sm:text-lg">{info.room?.code}</span>
-                            <button
-                                onClick={handleCopyCode}
-                                className="rounded-full bg-fuchsia-100 p-1 transition-all hover:bg-fuchsia-200 sm:p-1.5"
-                            >
-                                {copied ? (
-                                    <CheckCircle2 className="h-3 w-3 text-green-600 sm:h-4 sm:w-4" />
-                                ) : (
-                                    <Copy className="h-3 w-3 text-fuchsia-600 sm:h-4 sm:w-4" />
-                                )}
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="grid gap-3 sm:gap-4 lg:grid-cols-3">
-                        {/* Left Panel - Your Info */}
-                        <div className="lg:col-span-1">
-                            <div className="rounded-xl bg-white p-3 shadow-2xl sm:rounded-2xl sm:p-4">
-                                <div className="mb-2 flex items-center justify-between border-b border-gray-200 pb-2 sm:mb-3">
-                                    <div className="flex gap-2">
-                                        <Trophy className="h-4 w-4 text-fuchsia-600 sm:h-5 sm:w-5" />
-                                        <h2 className="text-sm font-bold text-gray-800 sm:text-base">
-                                            Thông Tin Của Bạn
-                                        </h2>
-                                    </div>
-                                    <Button variant="fuchsia" onClick={handleLogout}>
-                                        <LogOut />
-                                    </Button>
-                                </div>
-
-                                <div className="flex flex-col items-center space-y-2 sm:space-y-3">
-                                    <div className="relative">
-                                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-500 to-purple-600 text-2xl font-bold text-white shadow-lg ring-2 ring-white sm:h-24 sm:w-24 sm:text-4xl sm:ring-4">
-                                            {info.player?.fullName.charAt(0)?.toUpperCase() || "?"}
+                        <div className="grid gap-4 lg:grid-cols-3">
+                            {/* Left Panel - Your Info */}
+                            <div className="lg:col-span-1 animate-slide-in-left">
+                                <div className="glass-effect-strong rounded-3xl p-6 shadow-2xl">
+                                    <div className="mb-4 flex items-center justify-between border-b-2 border-gray-200 pb-3">
+                                        <div className="flex items-center gap-2">
+                                            <Trophy className="h-6 w-6 text-purple-600" />
+                                            <h2 className="text-lg font-black text-gray-800">Thông Tin Của Bạn</h2>
                                         </div>
-                                        {/* {info.player?.role === "HOST" && (
-                                            <div className="absolute -top-1 -right-1 rounded-full bg-yellow-400 p-1 shadow-lg ring-2 ring-white sm:p-1.5 sm:ring-4">
-                                                <Crown className="h-3 w-3 text-yellow-900 sm:h-4 sm:w-4" />
+                                        <Button
+                                            variant="destructive"
+                                            size="icon-sm"
+                                            onClick={handleLogout}
+                                            className="transition-smooth hover:scale-110"
+                                        >
+                                            <LogOut className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+
+                                    <div className="flex flex-col items-center space-y-4">
+                                        <div className="relative">
+                                            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-600 text-4xl font-black text-white shadow-2xl ring-4 ring-white">
+                                                {info.player?.fullName.charAt(0)?.toUpperCase() || "?"}
                                             </div>
-                                        )} */}
+                                            <div className="absolute -bottom-1 -right-1 rounded-full bg-green-500 p-1 shadow-lg ring-4 ring-white">
+                                                <div className="h-3 w-3 rounded-full bg-white"></div>
+                                            </div>
+                                        </div>
+
+                                        {/* Info */}
+                                        <div className="text-center w-full">
+                                            <h3 className="text-xl font-black text-gray-800">
+                                                {info.player?.fullName || "Unknown"}
+                                            </h3>
+                                            <p className="mt-2 rounded-full bg-gradient-to-r from-purple-100 to-pink-100 px-4 py-2 text-sm font-bold text-purple-700">
+                                                {info.club?.name || "No Club"}
+                                            </p>
+                                        </div>
+
+                                        {/* Stats */}
+                                        <div className="w-full space-y-3 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 p-4">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm font-bold text-gray-600">Trạng thái:</span>
+                                                {isConnected ? (
+                                                    <span className="flex items-center gap-2 text-sm font-black text-green-600">
+                                                        <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
+                                                        Đã kết nối
+                                                    </span>
+                                                ) : (
+                                                    <span className="flex items-center gap-2 text-sm font-black text-red-600">
+                                                        <div className="h-2 w-2 rounded-full bg-red-500"></div>
+                                                        Mất kết nối
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm font-bold text-gray-600">Điểm số:</span>
+                                                <span className="text-sm font-black text-purple-600">
+                                                    {info.player?.score || 0} 🏆
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Right Panel - Players List */}
+                            <div className="lg:col-span-2 animate-slide-in-right">
+                                <div className="glass-effect-strong rounded-3xl p-6 shadow-2xl">
+                                    <div className="mb-4 flex items-center justify-between border-b-2 border-gray-200 pb-3">
+                                        <div className="flex items-center gap-2">
+                                            <Users className="h-6 w-6 text-purple-600" />
+                                            <h2 className="text-lg font-black text-gray-800">
+                                                Thành viên khác trong CLB
+                                            </h2>
+                                        </div>
+                                        <span className="flex items-center gap-2 rounded-full bg-purple-100 px-4 py-2 text-sm font-black text-purple-700">
+                                            {Math.max(0, players.length - 1)} <User className="h-4 w-4" />
+                                        </span>
                                     </div>
 
-                                    {/* Info */}
-                                    <div className="text-center">
-                                        <h3 className="text-base font-bold text-gray-800 sm:text-xl">
-                                            {info.player?.fullName || "Unknown"}
-                                        </h3>
-                                        <p className="mt-1 rounded-full bg-fuchsia-100 px-2 py-0.5 text-xs font-semibold text-fuchsia-700 sm:px-3 sm:py-1 sm:text-sm">
-                                            {info.club?.name || "No Club"}
-                                        </p>
+                                    {/* Players Grid */}
+                                    <div className="max-h-96 overflow-y-auto pr-2">
+                                        <div className="grid gap-3 sm:grid-cols-2">
+                                            {players.map((player, index) => {
+                                                if (player.playerId === info.player.id) {
+                                                    return null;
+                                                }
+                                                return (
+                                                    <div
+                                                        key={player.id}
+                                                        className="group overflow-hidden rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 p-4 transition-all hover:scale-105 hover:shadow-lg"
+                                                        style={{
+                                                            animation: `fadeInUp 0.5s ease-out ${index * 0.1}s both`,
+                                                        }}
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            {/* Player Avatar */}
+                                                            <div className="flex-shrink-0">
+                                                                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-purple-400 to-pink-500 text-lg font-black text-white shadow-lg">
+                                                                    {player.fullName?.charAt(0)?.toUpperCase() || "?"}
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Player Info */}
+                                                            <div className="flex-1 overflow-hidden">
+                                                                <h3 className="truncate text-base font-black text-gray-800">
+                                                                    {player.fullName}
+                                                                </h3>
+                                                                <p className="text-xs font-semibold text-gray-600">
+                                                                    Đã sẵn sàng ✓
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
 
-                                    {/* Stats */}
-                                    <div className="mt-2 w-full space-y-1.5 rounded-xl bg-gradient-to-br from-fuchsia-50 to-purple-50 p-2.5 sm:mt-3 sm:space-y-2 sm:rounded-2xl sm:p-3">
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-xs font-medium text-gray-600 sm:text-sm">
-                                                Trạng thái:
-                                            </span>
-                                            {isConnected ? (
-                                                <span className="text-xs font-bold text-green-600 sm:text-sm">
-                                                    Đã kết nối
-                                                </span>
-                                            ) : (
-                                                <span className="text-xs font-bold text-red-600 sm:text-sm">
-                                                    Mất kết nối
-                                                </span>
-                                            )}
-                                        </div>
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-xs font-medium text-gray-600 sm:text-sm">
-                                                Điểm số:
-                                            </span>
-                                            <span className="text-xs font-bold text-purple-600 sm:text-sm">
-                                                {info.player?.score || 0}
-                                            </span>
-                                        </div>
+                                    {/* Loading Animation */}
+                                    <div className="mt-6 flex items-center justify-center gap-2">
+                                        <div
+                                            className="h-3 w-3 animate-bounce rounded-full bg-purple-500"
+                                            style={{ animationDelay: "0ms" }}
+                                        ></div>
+                                        <div
+                                            className="h-3 w-3 animate-bounce rounded-full bg-pink-500"
+                                            style={{ animationDelay: "150ms" }}
+                                        ></div>
+                                        <div
+                                            className="h-3 w-3 animate-bounce rounded-full bg-yellow-500"
+                                            style={{ animationDelay: "300ms" }}
+                                        ></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Right Panel - Players List */}
-                        <div className="lg:col-span-2">
-                            <div className="rounded-xl bg-white p-3 shadow-2xl sm:rounded-2xl sm:p-4">
-                                <div className="mb-2 flex items-center justify-between border-b border-gray-200 pb-2 sm:mb-3">
-                                    <div className="flex items-center gap-2">
-                                        <Users className="h-4 w-4 text-fuchsia-600 sm:h-5 sm:w-5" />
-                                        <h2 className="text-sm font-bold text-gray-800 sm:text-base">
-                                            Thành viên khác trong CLB
-                                        </h2>
-                                    </div>
-                                    <span className="flex items-center gap-1 rounded-full bg-fuchsia-100 px-2 py-0.5 text-xs font-bold text-fuchsia-700 sm:px-3 sm:py-1 sm:text-sm">
-                                        {Math.max(0, players.length - 1)} <User size={13} />
-                                    </span>
-                                </div>
-
-                                {/* Players Grid */}
-                                <div className="grid gap-2 sm:grid-cols-2 sm:gap-3">
-                                    {players.map((player, index) => {
-                                        console.log(player, info.player);
-
-                                        if (player.playerId === info.player.id) {
-                                            return null;
-                                        }
-                                        return (
-                                            <div
-                                                key={player.id}
-                                                className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-fuchsia-50 to-purple-50 p-2.5 transition-all hover:shadow-md sm:rounded-2xl sm:p-3"
-                                                style={{
-                                                    animation: `fadeInUp 0.5s ease-out ${index * 0.1}s both`,
-                                                }}
-                                            >
-                                                <div className="flex items-center gap-2 sm:gap-3">
-                                                    {/* Player Avatar */}
-                                                    <div className="relative flex-shrink-0">
-                                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-400 to-purple-500 text-sm font-bold text-white shadow-md sm:h-12 sm:w-12 sm:text-base">
-                                                            {player.fullName?.charAt(0)?.toUpperCase() || "?"}
-                                                        </div>
-                                                        {/* {player.role === "HOST" && (
-                                                        <div className="absolute -top-0.5 -right-0.5 rounded-full bg-yellow-400 p-0.5 shadow-md sm:p-1">
-                                                            <Crown className="h-2 w-2 text-yellow-900 sm:h-2.5 sm:w-2.5" />
-                                                        </div>
-                                                    )} */}
-                                                    </div>
-
-                                                    {/* Player Info */}
-                                                    <div className="flex-1 overflow-hidden">
-                                                        <h3 className="truncate text-sm font-bold text-gray-800 sm:text-base">
-                                                            {player.fullName}
-                                                        </h3>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-
-                                {/* Loading Animation */}
-                                <div className="mt-3 flex items-center justify-center gap-1.5 sm:mt-4 sm:gap-2">
-                                    <div
-                                        className="h-2 w-2 animate-bounce rounded-full bg-fuchsia-500 sm:h-2.5 sm:w-2.5"
-                                        style={{ animationDelay: "0ms" }}
-                                    ></div>
-                                    <div
-                                        className="h-2 w-2 animate-bounce rounded-full bg-purple-500 sm:h-2.5 sm:w-2.5"
-                                        style={{ animationDelay: "150ms" }}
-                                    ></div>
-                                    <div
-                                        className="h-2 w-2 animate-bounce rounded-full bg-pink-500 sm:h-2.5 sm:w-2.5"
-                                        style={{ animationDelay: "300ms" }}
-                                    ></div>
-                                </div>
-                            </div>
+                        {/* Bottom Info */}
+                        <div className="mt-6 text-center animate-pulse-slow">
+                            <p className="text-base font-bold text-white drop-shadow-lg">
+                                💡 Trò chơi sẽ bắt đầu khi chủ phòng nhấn nút bắt đầu
+                            </p>
                         </div>
-                    </div>
-
-                    {/* Bottom Info */}
-                    <div className="mt-3 text-center sm:mt-4">
-                        <p className="text-xs font-medium text-gray-700 sm:text-sm">
-                            💡 Trò chơi sẽ bắt đầu khi chủ phòng nhấn nút bắt đầu
-                        </p>
                     </div>
                 </div>
 
