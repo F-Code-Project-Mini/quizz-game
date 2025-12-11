@@ -5,6 +5,7 @@ import { Button } from "~/components/ui/button";
 import { socket } from "~/configs/socket";
 import privateApi from "~/lib/private-api";
 import Swal from "sweetalert2";
+import GameCountdown from "~/components/GameCountdown";
 import type { IRoom } from "~/types/room.types";
 
 interface GameState {
@@ -31,6 +32,7 @@ const RoomManagement = () => {
     const [gameState, setGameState] = useState<GameState | null>(null);
     const [players, setPlayers] = useState<Player[]>([]);
     const [loading, setLoading] = useState(true);
+    const [showCountdown, setShowCountdown] = useState(false);
 
     useEffect(() => {
         loadRoomData();
@@ -64,17 +66,24 @@ const RoomManagement = () => {
     };
 
     const handleStartGame = async () => {
+        if (!room || !room.questions || room.questions.length === 0) {
+            Swal.fire({
+                title: "Lỗi",
+                text: "Phòng chưa có câu hỏi nào",
+                icon: "error",
+            });
+            return;
+        }
+
+        setShowCountdown(true);
+    };
+
+    const handleCountdownComplete = async () => {
         try {
             const response = await privateApi.post(`/room/${roomId}/start`);
             if (response.data.success) {
                 socket.emit("start_game", { roomCode: room?.code });
                 await loadRoomData();
-                Swal.fire({
-                    title: "Thành công",
-                    text: "Trò chơi đã bắt đầu!",
-                    icon: "success",
-                    timer: 2000,
-                });
             }
         } catch (error: any) {
             Swal.fire({
@@ -273,6 +282,15 @@ const RoomManagement = () => {
                     </div>
                 </div>
             </div>
+
+            {showCountdown && (
+                <GameCountdown
+                    onComplete={() => {
+                        setShowCountdown(false);
+                        handleCountdownComplete();
+                    }}
+                />
+            )}
         </div>
     );
 };

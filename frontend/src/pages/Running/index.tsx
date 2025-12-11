@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Circle, Square, Triangle, Star, Trophy } from "lucide-react";
 import { socket } from "~/configs/socket";
 import Swal from "sweetalert2";
+import AnswerFeedback from "~/components/AnswerFeedback";
 
 const answerShapes = [
     {
@@ -58,7 +59,16 @@ const RunningPage = () => {
             return;
         }
 
+        // Re-join room to ensure we're still in the socket room
+        socket.emit("join_game", {
+            roomCode: roomInfo.code,
+            fullName: playerInfo.fullName,
+            playerId: playerInfo.id,
+            clubId: playerInfo.clubId,
+        });
+
         socket.on("sync_game_state", (data) => {
+            console.log("sync_game_state received", data);
             setCurrentQuestion(data.question);
             setQuestionIndex(data.currentQuestionIndex);
             setTotalQuestions(data.totalQuestions);
@@ -69,6 +79,7 @@ const RunningPage = () => {
         });
 
         socket.on("game_started", (data) => {
+            console.log("game_started received", data);
             setCurrentQuestion(data.question);
             setQuestionIndex(data.currentQuestionIndex);
             setTotalQuestions(data.totalQuestions);
@@ -76,6 +87,7 @@ const RunningPage = () => {
         });
 
         socket.on("next_question", (data) => {
+            console.log("next_question received", data);
             setCurrentQuestion(data.question);
             setQuestionIndex(data.currentQuestionIndex);
             setTotalQuestions(data.totalQuestions);
@@ -86,6 +98,7 @@ const RunningPage = () => {
         });
 
         socket.on("answer_result", (data) => {
+            console.log("answer_result received", data);
             setIsCorrect(data.isCorrect);
             setScore(data.totalScore);
             setTimeout(() => {
@@ -198,18 +211,6 @@ const RunningPage = () => {
                     </div>
                 </div>
 
-                {isCorrect !== null && (
-                    <div
-                        className={`mb-4 rounded-2xl p-4 text-center text-white shadow-lg animate-scale-in ${
-                            isCorrect
-                                ? "bg-gradient-to-r from-green-500 to-green-600"
-                                : "bg-gradient-to-r from-red-500 to-red-600"
-                        }`}
-                    >
-                        <p className="text-2xl font-black">{isCorrect ? "Chính xác!" : "Sai rồi!"}</p>
-                    </div>
-                )}
-
                 <div className="mb-6 rounded-2xl bg-white/90 p-6 text-center shadow-xl">
                     <p className="text-xl font-bold text-gray-800">Nhìn lên màn hình và chọn đáp án</p>
                 </div>
@@ -235,6 +236,8 @@ const RunningPage = () => {
                 <div className="mt-4 rounded-xl bg-white/90 p-3 text-center shadow-lg">
                     <p className="text-sm font-bold text-gray-700">{playerInfo?.fullName}</p>
                 </div>
+
+                <AnswerFeedback isCorrect={isCorrect} score={score} show={isCorrect !== null} />
             </div>
         </div>
     );

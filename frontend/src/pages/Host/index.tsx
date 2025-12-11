@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { Trophy, Clock, Users } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Trophy, Clock, Users, PlayCircle, SkipForward, StopCircle } from "lucide-react";
 import { socket } from "~/configs/socket";
+import privateApi from "~/lib/private-api";
 import publicApi from "~/lib/axios-instance";
 import type { IRoom } from "~/types/room.types";
+import GameCountdown from "~/components/GameCountdown";
+import GameLeaderboard from "~/components/GameLeaderboard";
+import Swal from "sweetalert2";
 
 interface GameState {
     currentQuestionIndex: number;
@@ -23,11 +27,13 @@ interface Player {
 
 const HostView = () => {
     const { roomId } = useParams();
+    const navigate = useNavigate();
     const [room, setRoom] = useState<IRoom | null>(null);
     const [gameState, setGameState] = useState<GameState | null>(null);
     const [players, setPlayers] = useState<Player[]>([]);
     const [timeLeft, setTimeLeft] = useState(0);
     const [showLeaderboard, setShowLeaderboard] = useState(false);
+    const [showCountdown, setShowCountdown] = useState(false);
 
     useEffect(() => {
         loadRoomData();
@@ -51,13 +57,20 @@ const HostView = () => {
             });
             setShowLeaderboard(false);
             loadRoomData();
+        });show_leaderboard", (data) => {
+            setPlayers(data.leaderboard);
+            setShowLeaderboard(true);
         });
 
         socket.on("game_ended", (data) => {
             setPlayers(data.leaderboard);
             setShowLeaderboard(true);
+            setGameState((prev) => prev ? { ...prev, isActive: false } : nullta) => {
+            setPlayers(data.leaderboard);
+            setShowLeaderboard(true);
         });
-
+show_leaderboard");
+            socket.off("
         socket.on("player_answered", (data) => {
             setPlayers((prev) => prev.map((p) => (p.id === data.playerId ? { ...p, score: data.score } : p)));
         });
@@ -83,7 +96,11 @@ const HostView = () => {
             return Math.max(0, currentQuestion.timeQuestion - elapsed);
         };
 
-        setTimeLeft(calculateTimeLeft());
+        setT    // Auto show leaderboard when time runs out
+                setTimeout(() => {
+                    loadLeaderboard();
+                }, 1000);
+            imeLeft(calculateTimeLeft());
 
         const timer = setInterval(() => {
             const newTimeLeft = calculateTimeLeft();
@@ -105,7 +122,106 @@ const HostView = () => {
                 setPlayers(response.data.result.room.players || []);
 
                 if (response.data.result.gameState) {
-                    socket.emit("join_game", {
+      
+
+    const loadLeaderboard = async () => {
+        try {
+            const response = await publicApi.get(`/room/${roomId}/leaderboard`);
+            if (response.data.success) {
+                setPlayers(response.data.result);
+                setShowLeaderboard(true);
+                socket.emit("show_leaderboard", { 
+                    roomCode: room?.code,
+                    leaderboard: response.data.result 
+                });
+            }
+        } catch (error) {
+            console.error("Error loading leaderboard:", error);
+        }
+    };
+
+    const handleStartGame = () => {
+        if (!room || !room.questions || room.questions.length === 0) {
+            Swal.fire({
+                title: "Lỗi",
+                text: "Phòng chưa có câu hỏi nào",
+                icon: "error",
+            });
+            return;
+        }
+        setShowCountdown(true);
+    };
+
+    const handleCountdownComplete = async () => {
+        try {
+            const response = await privateApi.post(`/room/${roomId}/start`);
+            if (response.data.success) {
+                socket.emit("start_game", { roomCode: room?.code });
+                await loadRoomData();
+            }
+        } catch (error: any) {
+            Swal.fire({
+                title: "Lỗi",
+                text: error.response?.data?.message || "Không thể bắt đầu trò chơi",
+                icon: "error",
+            });
+        }
+    };
+
+    const handleNextQuestion = async () => {
+        try {
+            const response = await privateApi.post(`/room/${roomId}/next`);
+            if (response.data.success) {
+                socket.emit("next_question", { roomCode: room?.code });
+                await loadRoomData();
+                setShowLeaderboard(false);
+            }
+        } catch (error: any) {
+            if (error.response?.data?.message === "Đã hết câu hỏi") {
+                Swal.fire({
+                    title: "Kết thúc",
+                    text: "Đã hết câu hỏi. Vui lòng kết thúc trò chơi.",
+                    icon: "info",
+                });
+            } else {
+                Swal.fire({
+                    title: "Lỗi",
+                    text: error.response?.data?.message || "Không thể chuyển câu hỏi",
+                    icon: "error",
+                });
+            }
+        }
+    };
+
+    const handleEndGame = async () => {
+        const result = await Swal.fire({
+            title: "Xác nhận",
+            text: "Bạn có chắc muốn kết thúc trò chơi?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Kết thúc",
+            cancelButtonText: "Hủy",
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await privateApi.post(`/room/${roomId}/end`);
+                if (response.data.success) {
+                    socket.emit("game_ended", { 
+                        roomCode: room?.code,
+                        leaderboard: players 
+                    });
+                    await loadLeaderboard();
+                }
+            } catch (error: any) {
+                Swal.fire({
+                    title: "Lỗi",
+                    text: error.response?.data?.message || "Không thể kết thúc trò chơi",
+                    icon: "error",
+                });
+            }
+        }
+    };              socket.emit("join_game", {
                         roomCode: response.data.result.room.code,
                         fullName: "Host",
                         playerId: "host",

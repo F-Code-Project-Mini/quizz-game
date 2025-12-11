@@ -25,7 +25,6 @@ const App = () => {
                     <Route path="/running" element={<RunningPage />} />
                     <Route path="/result" element={<ResultPage />} />
                     <Route path="/login" element={<LoginPage />} />
-                    <Route path="/create-quiz" element={<CreateQuizPage />} />
                     <Route path="/host/:roomId" element={<HostView />} />
                     <Route path="*" element={<div>404 Not Found</div>} />
                 </Route>
@@ -40,6 +39,7 @@ const App = () => {
                 >
                     <Route index element={<AdminDashboard />} />
                     <Route path="room/:roomId" element={<RoomManagement />} />
+                    <Route path="create-quiz" element={<CreateQuizPage />} />
                 </Route>
             </Routes>
         </AuthProvider>
