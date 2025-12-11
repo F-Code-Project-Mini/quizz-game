@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import { AnyZodObject, ZodError } from "zod/v3";
+import { AnyZodObject, ZodError, ZodTypeAny } from "zod/v3";
 import { HTTP_STATUS } from "~/constants/httpStatus";
 import Helpers from "./helpers";
 
-export const validate = (schema: AnyZodObject) => (req: Request, res: Response, next: NextFunction) => {
+export const validate = (schema: AnyZodObject | ZodTypeAny) => (req: Request, res: Response, next: NextFunction) => {
     try {
         // Gộp body, params, query vào validate một lần
         const result = schema.parse({

@@ -6,6 +6,7 @@ import DemoPage from "./pages/Demo";
 import RunningPage from "./pages/Running";
 import LoginPage from "./pages/Login";
 import ResultPage from "./pages/Result";
+import CreateQuizPage from "./pages/CreateQuiz";
 
 const App = () => {
     return (
@@ -18,6 +19,7 @@ const App = () => {
                 <Route path="/result" element={<ResultPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="*" element={<div>404 Not Found</div>} />
+                <Route path="/create-quiz" element={<CreateQuizPage />} />
             </Route>
         </Routes>
     );
