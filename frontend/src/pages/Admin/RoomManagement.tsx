@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { PlayCircle, SkipForward, StopCircle, Users, MonitorPlay, ArrowLeft } from "lucide-react";
+import { PlayCircle, SkipForward, StopCircle, Users, MonitorPlay, ArrowLeft, RefreshCw } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { socket } from "~/configs/socket";
 import privateApi from "~/lib/private-api";
@@ -75,7 +75,8 @@ const RoomManagement = () => {
             return;
         }
 
-        setShowCountdown(true);
+        // Redirect to host view
+        navigate(`/host/${roomId}`);
     };
 
     const handleCountdownComplete = async () => {
@@ -150,6 +151,38 @@ const RoomManagement = () => {
         }
     };
 
+    const handleResetGame = async () => {
+        const result = await Swal.fire({
+            title: "Reset trò chơi",
+            text: "Bạn có chắc muốn reset và chơi lại? Tất cả điểm sẽ bị xóa.",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Reset",
+            cancelButtonText: "Hủy",
+            confirmButtonColor: "#3b82f6",
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await privateApi.post(`/room/${roomId}/reset`);
+                if (response.data.success) {
+                    await loadRoomData();
+                    Swal.fire({
+                        title: "Thành công",
+                        text: "Phòng đã được reset, có thể chơi lại!",
+                        icon: "success",
+                    });
+                }
+            } catch (error: any) {
+                Swal.fire({
+                    title: "Lỗi",
+                    text: error.response?.data?.message || "Không thể reset trò chơi",
+                    icon: "error",
+                });
+            }
+        }
+    };
+
     const handleOpenHostView = () => {
         window.open(`/host/${roomId}`, "_blank", "width=1920,height=1080");
     };
@@ -211,6 +244,15 @@ const RoomManagement = () => {
                                         Kết thúc
                                     </Button>
                                 </>
+                            )}
+                            {room.status === "FINISHED" && (
+                                <Button
+                                    onClick={handleResetGame}
+                                    className="bg-gradient-to-r from-blue-600 to-blue-700"
+                                >
+                                    <RefreshCw className="mr-2 h-5 w-5" />
+                                    Reset và chơi lại
+                                </Button>
                             )}
                             <Button onClick={handleOpenHostView} variant="outline">
                                 <MonitorPlay className="mr-2 h-5 w-5" />

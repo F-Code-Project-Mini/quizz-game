@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Trophy, Clock, Users, PlayCircle, SkipForward, StopCircle } from "lucide-react";
+import { useParams } from "react-router-dom";
+import { Trophy, Clock, Users, PlayCircle } from "lucide-react";
 import { socket } from "~/configs/socket";
 import privateApi from "~/lib/private-api";
 import publicApi from "~/lib/axios-instance";
@@ -21,27 +21,34 @@ interface Player {
     fullName: string;
     score: number;
     club: {
+        id: string;
         name: string;
     };
 }
 
 const HostView = () => {
     const { roomId } = useParams();
-    const navigate = useNavigate();
     const [room, setRoom] = useState<IRoom | null>(null);
     const [gameState, setGameState] = useState<GameState | null>(null);
     const [players, setPlayers] = useState<Player[]>([]);
+    const [onlinePlayerCount, setOnlinePlayerCount] = useState(0);
     const [timeLeft, setTimeLeft] = useState(0);
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [showCountdown, setShowCountdown] = useState(false);
+    const [showAnswerFeedback, setShowAnswerFeedback] = useState(false);
 
     useEffect(() => {
         loadRoomData();
 
+        socket.on("start_countdown", () => {
+            setShowCountdown(true);
+        });
+
         socket.on("game_started", (data) => {
+            setShowCountdown(false);
             setGameState({
                 currentQuestionIndex: data.currentQuestionIndex,
-                questionStartedAt: new Date().toISOString(),
+                questionStartedAt: data.questionStartedAt,
                 totalQuestions: data.totalQuestions,
                 isActive: true,
             });
@@ -51,13 +58,15 @@ const HostView = () => {
         socket.on("next_question", (data) => {
             setGameState({
                 currentQuestionIndex: data.currentQuestionIndex,
-                questionStartedAt: new Date().toISOString(),
+                questionStartedAt: data.questionStartedAt,
                 totalQuestions: data.totalQuestions,
                 isActive: true,
             });
             setShowLeaderboard(false);
             loadRoomData();
-        });show_leaderboard", (data) => {
+        });
+
+        socket.on("show_leaderboard", (data) => {
             setPlayers(data.leaderboard);
             setShowLeaderboard(true);
         });
@@ -65,21 +74,43 @@ const HostView = () => {
         socket.on("game_ended", (data) => {
             setPlayers(data.leaderboard);
             setShowLeaderboard(true);
-            setGameState((prev) => prev ? { ...prev, isActive: false } : nullta) => {
-            setPlayers(data.leaderboard);
-            setShowLeaderboard(true);
+            setGameState((prev) => (prev ? { ...prev, isActive: false } : null));
         });
-show_leaderboard");
-            socket.off("
+
         socket.on("player_answered", (data) => {
             setPlayers((prev) => prev.map((p) => (p.id === data.playerId ? { ...p, score: data.score } : p)));
         });
 
+        socket.on("player_joined", (data) => {
+            setOnlinePlayerCount(data.count);
+        });
+
+        socket.on("player_left", (data) => {
+            setOnlinePlayerCount(data.count);
+        });
+
+        // Host joins room to enable real-time features
+        const joinAsHost = async () => {
+            const roomData = await loadRoomData();
+            if (roomData?.code) {
+                socket.emit("host_join", { roomCode: roomData.code });
+            }
+        };
+        joinAsHost();
+
+        // Cleanup: notify backend when host leaves
         return () => {
+            if (room?.code) {
+                socket.emit("host_leave", { roomCode: room.code });
+            }
+            socket.off("start_countdown");
             socket.off("game_started");
             socket.off("next_question");
+            socket.off("show_leaderboard");
             socket.off("game_ended");
             socket.off("player_answered");
+            socket.off("player_joined");
+            socket.off("player_left");
         };
     }, [roomId]);
 
@@ -96,17 +127,15 @@ show_leaderboard");
             return Math.max(0, currentQuestion.timeQuestion - elapsed);
         };
 
-        setT    // Auto show leaderboard when time runs out
-                setTimeout(() => {
-                    loadLeaderboard();
-                }, 1000);
-            imeLeft(calculateTimeLeft());
+        setTimeLeft(calculateTimeLeft());
 
         const timer = setInterval(() => {
             const newTimeLeft = calculateTimeLeft();
             setTimeLeft(newTimeLeft);
             if (newTimeLeft === 0) {
                 clearInterval(timer);
+                // Show answer feedback (highlight correct answer)
+                setShowAnswerFeedback(true);
             }
         }, 100);
 
@@ -120,9 +149,13 @@ show_leaderboard");
                 setRoom(response.data.result.room);
                 setGameState(response.data.result.gameState);
                 setPlayers(response.data.result.room.players || []);
-
-                if (response.data.result.gameState) {
-      
+                return response.data.result.room;
+            }
+        } catch (error) {
+            console.error("Error loading room data:", error);
+        }
+        return null;
+    };
 
     const loadLeaderboard = async () => {
         try {
@@ -130,9 +163,9 @@ show_leaderboard");
             if (response.data.success) {
                 setPlayers(response.data.result);
                 setShowLeaderboard(true);
-                socket.emit("show_leaderboard", { 
+                socket.emit("show_leaderboard", {
                     roomCode: room?.code,
-                    leaderboard: response.data.result 
+                    leaderboard: response.data.result,
                 });
             }
         } catch (error) {
@@ -149,16 +182,15 @@ show_leaderboard");
             });
             return;
         }
-        setShowCountdown(true);
+
+        // Just emit start event, backend will handle countdown
+        socket.emit("start_game", { roomCode: room?.code });
     };
 
     const handleCountdownComplete = async () => {
+        // Backend already started the game, just update local state
         try {
-            const response = await privateApi.post(`/room/${roomId}/start`);
-            if (response.data.success) {
-                socket.emit("start_game", { roomCode: room?.code });
-                await loadRoomData();
-            }
+            await loadRoomData();
         } catch (error: any) {
             Swal.fire({
                 title: "Lỗi",
@@ -169,6 +201,14 @@ show_leaderboard");
     };
 
     const handleNextQuestion = async () => {
+        // If showing answer feedback, load leaderboard first
+        if (showAnswerFeedback) {
+            setShowAnswerFeedback(false);
+            await loadLeaderboard();
+            return;
+        }
+
+        // Otherwise, proceed to next question
         try {
             const response = await privateApi.post(`/room/${roomId}/next`);
             if (response.data.success) {
@@ -207,9 +247,9 @@ show_leaderboard");
             try {
                 const response = await privateApi.post(`/room/${roomId}/end`);
                 if (response.data.success) {
-                    socket.emit("game_ended", { 
+                    socket.emit("game_ended", {
                         roomCode: room?.code,
-                        leaderboard: players 
+                        leaderboard: players,
                     });
                     await loadLeaderboard();
                 }
@@ -221,16 +261,38 @@ show_leaderboard");
                 });
             }
         }
-    };              socket.emit("join_game", {
-                        roomCode: response.data.result.room.code,
-                        fullName: "Host",
-                        playerId: "host",
-                        clubId: "host",
+    };
+
+    const handleResetGame = async () => {
+        const result = await Swal.fire({
+            title: "Reset trò chơi",
+            text: "Bạn có chắc muốn reset và chơi lại?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Reset",
+            cancelButtonText: "Hủy",
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await privateApi.post(`/room/${roomId}/reset`);
+                if (response.data.success) {
+                    Swal.fire({
+                        title: "Thành công",
+                        text: "Phòng đã được reset, có thể chơi lại",
+                        icon: "success",
                     });
+                    await loadRoomData();
+                    setShowLeaderboard(false);
+                    setGameState(null);
                 }
+            } catch (error: any) {
+                Swal.fire({
+                    title: "Lỗi",
+                    text: error.response?.data?.message || "Không thể reset trò chơi",
+                    icon: "error",
+                });
             }
-        } catch (error) {
-            console.error("Error loading room data:", error);
         }
     };
 
@@ -244,83 +306,56 @@ show_leaderboard");
         );
     }
 
-    if (showLeaderboard || room.status === "FINISHED") {
+    // Show leaderboard
+    if (showLeaderboard) {
         return (
-            <div className="min-h-screen bg-gradient-game p-8">
-                <div className="mx-auto max-w-6xl">
-                    <div className="mb-8 text-center animate-scale-in">
-                        <Trophy className="mx-auto mb-4 h-24 w-24 text-yellow-400 animate-bounce" />
-                        <h1 className="text-5xl font-black text-white drop-shadow-lg">Bảng xếp hạng</h1>
-                        <p className="mt-2 text-2xl text-white/90">{room.name}</p>
-                    </div>
-
-                    <div className="space-y-4">
-                        {players.slice(0, 10).map((player, idx) => (
-                            <div
-                                key={player.id}
-                                className={`flex items-center justify-between rounded-2xl p-6 shadow-2xl animate-slide-in-up ${
-                                    idx === 0
-                                        ? "bg-gradient-to-r from-yellow-400 to-orange-500"
-                                        : idx === 1
-                                          ? "bg-gradient-to-r from-gray-300 to-gray-400"
-                                          : idx === 2
-                                            ? "bg-gradient-to-r from-orange-400 to-orange-500"
-                                            : "bg-white"
-                                }`}
-                                style={{ animationDelay: `${idx * 100}ms` }}
-                            >
-                                <div className="flex items-center gap-6">
-                                    <div
-                                        className={`flex h-16 w-16 items-center justify-center rounded-full text-3xl font-black ${
-                                            idx < 3
-                                                ? "bg-white text-gray-800"
-                                                : "bg-gradient-to-br from-purple-600 to-pink-600 text-white"
-                                        }`}
-                                    >
-                                        {idx + 1}
-                                    </div>
-                                    <div>
-                                        <p
-                                            className={`text-2xl font-black ${idx < 3 ? "text-white" : "text-gray-800"}`}
-                                        >
-                                            {player.fullName}
-                                        </p>
-                                        <p className={`text-lg ${idx < 3 ? "text-white/90" : "text-gray-600"}`}>
-                                            {player.club.name}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <p className={`text-4xl font-black ${idx < 3 ? "text-white" : "text-purple-600"}`}>
-                                        {player.score}
-                                    </p>
-                                    <p className={`text-lg ${idx < 3 ? "text-white/90" : "text-gray-600"}`}>điểm</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
+            <GameLeaderboard
+                players={players}
+                currentQuestion={(gameState?.currentQuestionIndex || 0) + 1}
+                totalQuestions={room.questions?.length || 0}
+                onNext={handleNextQuestion}
+                onEnd={handleEndGame}
+                onReset={room?.status === "FINISHED" ? handleResetGame : undefined}
+                isHost={true}
+            />
         );
     }
 
+    // Waiting room
     if (room.status === "WAITING") {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-gradient-game p-8">
+            <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-game p-8">
                 <div className="text-center">
                     <div className="mb-8 flex justify-center">
-                        <div className="rounded-3xl bg-white p-6 shadow-2xl animate-pulse">
-                            <img src="/logo.svg" alt="Logo" className="h-32 w-32" />
+                        <div className="animate-pulse rounded-3xl bg-white p-6 shadow-2xl">
+                            <Trophy className="h-32 w-32 text-purple-600" />
                         </div>
                     </div>
                     <h1 className="mb-4 text-6xl font-black text-white drop-shadow-lg">{room.name}</h1>
                     <p className="mb-8 text-3xl font-semibold text-white/90">Mã phòng: {room.code}</p>
                     <div className="mb-8 flex items-center justify-center gap-4">
                         <Users className="h-12 w-12 text-white" />
-                        <span className="text-4xl font-black text-white">{players.length} người chơi</span>
+                        <span className="text-4xl font-black text-white">{onlinePlayerCount} người chơi</span>
                     </div>
-                    <p className="text-2xl text-white/80 animate-pulse">Đang chờ bắt đầu...</p>
+
+                    <button
+                        onClick={handleStartGame}
+                        disabled={!room.questions || room.questions.length === 0}
+                        className="rounded-2xl bg-gradient-to-r from-green-500 to-green-700 px-12 py-6 text-3xl font-black text-white shadow-2xl transition-all hover:scale-105 disabled:opacity-50"
+                    >
+                        <PlayCircle className="mr-3 inline-block h-10 w-10" />
+                        Bắt đầu trò chơi
+                    </button>
                 </div>
+
+                {showCountdown && (
+                    <GameCountdown
+                        onComplete={() => {
+                            setShowCountdown(false);
+                            handleCountdownComplete();
+                        }}
+                    />
+                )}
             </div>
         );
     }
@@ -335,6 +370,7 @@ show_leaderboard");
         );
     }
 
+    // Question display
     return (
         <div className="min-h-screen bg-gradient-game p-8">
             <div className="mx-auto max-w-7xl">
@@ -344,13 +380,25 @@ show_leaderboard");
                             Câu {(gameState?.currentQuestionIndex || 0) + 1}/{room.questions?.length || 0}
                         </p>
                     </div>
-                    <div className="flex items-center gap-4 rounded-2xl bg-white px-6 py-3 shadow-lg">
-                        <Clock className="h-8 w-8 text-purple-600" />
-                        <span
-                            className={`text-3xl font-black ${timeLeft <= 5 ? "text-red-600 animate-pulse" : "text-gray-800"}`}
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-4 rounded-2xl bg-white px-6 py-3 shadow-lg">
+                            <Clock className="h-8 w-8 text-purple-600" />
+                            <span
+                                className={`text-3xl font-black ${
+                                    timeLeft <= currentQuestion.timeQuestion / 4
+                                        ? "animate-pulse text-red-600"
+                                        : "text-gray-800"
+                                }`}
+                            >
+                                {timeLeft}s
+                            </span>
+                        </div>
+                        <button
+                            onClick={loadLeaderboard}
+                            className="rounded-2xl bg-gradient-to-r from-blue-500 to-blue-700 px-6 py-3 font-bold text-white shadow-lg transition-all hover:scale-105"
                         >
-                            {timeLeft}s
-                        </span>
+                            <Trophy className="inline h-6 w-6" /> Xem BXH
+                        </button>
                     </div>
                 </div>
 
@@ -362,20 +410,22 @@ show_leaderboard");
                     {currentQuestion.answers?.map((answer: any, idx: number) => (
                         <div
                             key={answer.id}
-                            className={`rounded-2xl p-6 shadow-xl transition-transform hover:scale-105 ${
-                                answer.isCorrect
-                                    ? "bg-gradient-to-br from-green-500 to-green-600"
-                                    : idx === 0
-                                      ? "bg-gradient-to-br from-red-500 to-red-600"
-                                      : idx === 1
-                                        ? "bg-gradient-to-br from-blue-500 to-blue-600"
-                                        : idx === 2
-                                          ? "bg-gradient-to-br from-yellow-500 to-yellow-600"
-                                          : "bg-gradient-to-br from-purple-500 to-purple-600"
-                            }`}
+                            className={`rounded-2xl p-6 shadow-xl transition-all ${
+                                showAnswerFeedback && answer.isCorrect
+                                    ? "scale-110 ring-8 ring-yellow-400 animate-pulse bg-gradient-to-br from-green-500 to-green-600"
+                                    : answer.isCorrect
+                                      ? "bg-gradient-to-br from-green-500 to-green-600"
+                                      : idx === 0
+                                        ? "bg-gradient-to-br from-red-500 to-red-600"
+                                        : idx === 1
+                                          ? "bg-gradient-to-br from-blue-500 to-blue-600"
+                                          : idx === 2
+                                            ? "bg-gradient-to-br from-yellow-500 to-yellow-600"
+                                            : "bg-gradient-to-br from-purple-500 to-purple-600"
+                            } ${showAnswerFeedback && !answer.isCorrect ? "opacity-50" : ""}`}
                         >
                             <div className="flex items-center gap-4">
-                                <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl bg-white/30 text-3xl font-black text-white">
+                                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-white/30 text-3xl font-black text-white">
                                     {String.fromCharCode(65 + idx)}
                                 </div>
                                 <p className="text-2xl font-bold text-white">{answer.answer}</p>
@@ -383,6 +433,18 @@ show_leaderboard");
                         </div>
                     ))}
                 </div>
+
+                {/* Show Next button when answer feedback is displayed */}
+                {showAnswerFeedback && (
+                    <div className="mt-8 flex justify-center">
+                        <button
+                            onClick={handleNextQuestion}
+                            className="rounded-2xl bg-gradient-to-r from-green-500 to-green-700 px-12 py-6 text-3xl font-black text-white shadow-2xl transition-all hover:scale-105 animate-bounce"
+                        >
+                            Tiếp theo →
+                        </button>
+                    </div>
+                )}
 
                 <div className="mt-8 rounded-2xl bg-white p-6 shadow-lg">
                     <div className="mb-4 flex items-center gap-2">
@@ -393,12 +455,12 @@ show_leaderboard");
                         {players
                             .sort((a, b) => b.score - a.score)
                             .slice(0, 5)
-                            .map((player, idx) => (
+                            .map((player) => (
                                 <div
                                     key={player.id}
                                     className="rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 p-3 text-center"
                                 >
-                                    <p className="text-lg font-bold text-gray-800 truncate">{player.fullName}</p>
+                                    <p className="truncate text-lg font-bold text-gray-800">{player.fullName}</p>
                                     <p className="text-2xl font-black text-purple-600">{player.score}</p>
                                 </div>
                             ))}

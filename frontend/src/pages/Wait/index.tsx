@@ -6,6 +6,8 @@ import { socket } from "~/configs/socket";
 import type { IClub } from "~/types/club.types";
 import { Button } from "~/components/ui/button";
 import CountDown from "~/components/CountDown";
+import GameCountdown from "~/components/GameCountdown";
+import Swal from "sweetalert2";
 
 const WaitPage = () => {
     const navigate = useNavigate();
@@ -43,6 +45,7 @@ const WaitPage = () => {
     const [waitingDots, setWaitingDots] = useState(".");
     const [copied, setCopied] = useState(false);
     const [showCountdown, setShowCountdown] = useState(false);
+    const [showGameCountdown, setShowGameCountdown] = useState(false);
     const roomCode = localStorage.getItem("roomCode") || "ROOM123"; // Mock data
     const handleLogout = () => {
         localStorage.removeItem("player");
@@ -70,12 +73,28 @@ const WaitPage = () => {
             setPlayers(data);
         });
 
+        socket.on("start_countdown", () => {
+            setShowGameCountdown(true);
+        });
+
         socket.on("game_started", () => {
+            setShowGameCountdown(false);
             navigate("/running");
         });
 
         socket.on("sync_game_state", () => {
             navigate("/running");
+        });
+
+        socket.on("room_closed", (data) => {
+            Swal.fire({
+                title: "Phòng đã đóng",
+                text: data.message,
+                icon: "warning",
+                confirmButtonText: "OK",
+            }).then(() => {
+                handleLogout();
+            });
         });
 
         socket.emit("join_game", {
@@ -88,8 +107,10 @@ const WaitPage = () => {
             socket.off("connect", handleConnect);
             socket.off("disconnect", handleDisconnect);
             socket.off(`update_participants_${info?.club.id}`);
+            socket.off("start_countdown");
             socket.off("game_started");
             socket.off("sync_game_state");
+            socket.off("room_closed");
         };
     }, []);
 
@@ -109,6 +130,8 @@ const WaitPage = () => {
                     console.log("Countdown completed!");
                 }}
             />
+
+            {showGameCountdown && <GameCountdown onComplete={() => setShowGameCountdown(false)} />}
 
             <div className="relative min-h-screen overflow-hidden bg-gradient-game">
                 {/* Animated Background */}

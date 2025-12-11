@@ -29,7 +29,7 @@ export const handleLogin = async (req: Request, res: Response) => {
             payload: { userId: user.id, username: user.username, type: TokenType.AccessToken },
         });
 
-        res.cookie("access_token", token, { httpOnly: true, secure: true, maxAge: ExpiresInTokenType.AccessToken });
+        res.cookie("access_token", token, { httpOnly: true, secure: true, maxAge: ExpiresInTokenType.AccessToken * 1000 });
 
         return res.status(HTTP_STATUS.OK).json({
             success: true,

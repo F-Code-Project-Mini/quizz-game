@@ -5,6 +5,7 @@ import {
     startGameController,
     nextQuestionController,
     endGameController,
+    resetGameController,
     getRoomStateController,
     getLeaderboardController,
     submitAnswerController,
@@ -24,6 +25,7 @@ roomRouter.post("/create-quiz", validate(createQuizRule), createQuizController);
 roomRouter.post("/:roomId/start", authMiddleware.auth, startGameController);
 roomRouter.post("/:roomId/next", authMiddleware.auth, nextQuestionController);
 roomRouter.post("/:roomId/end", authMiddleware.auth, endGameController);
+roomRouter.post("/:roomId/reset", authMiddleware.auth, resetGameController);
 roomRouter.get("/:roomId/state", getRoomStateController);
 roomRouter.get("/:roomId/leaderboard", getLeaderboardController);
 roomRouter.post("/submit-answer", submitAnswerController);

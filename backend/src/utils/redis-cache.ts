@@ -1,5 +1,20 @@
 import redisClient from "~/configs/redis";
 
+/**
+ * Redis Cache Strategy:
+ *
+ * CACHE (Fast, Temporary Data):
+ * - Game state (current question index, timestamps) - Changes frequently during game
+ * - Player answers for current question - Only during active question
+ * - Live leaderboard scores - Real-time ranking
+ *
+ * DO NOT CACHE (Use Database):
+ * - Room details (name, code, creator) - Rarely changes
+ * - Questions and answers - Static data
+ * - Player profiles - Static data
+ * - Final game results - Permanent storage
+ */
+
 interface GameState {
     roomId: string;
     currentQuestionIndex: number;
@@ -66,22 +81,6 @@ class RedisCache {
         return answers;
     }
 
-    async setRoomCache(roomId: string, data: any): Promise<void> {
-        const key = this.getKey("room", roomId);
-        await redisClient.set(key, JSON.stringify(data), "EX", 1800);
-    }
-
-    async getRoomCache(roomId: string): Promise<any> {
-        const key = this.getKey("room", roomId);
-        const data = await redisClient.get(key);
-        return data ? JSON.parse(data) : null;
-    }
-
-    async deleteRoomCache(roomId: string): Promise<void> {
-        const key = this.getKey("room", roomId);
-        await redisClient.del(key);
-    }
-
     async setPlayerScore(roomId: string, playerId: string, score: number): Promise<void> {
         const key = this.getKey("scores", roomId);
         await redisClient.zadd(key, score, playerId);
@@ -111,7 +110,6 @@ class RedisCache {
     async clearRoomData(roomId: string): Promise<void> {
         const patterns = [
             this.getKey("game_state", roomId),
-            this.getKey("room", roomId),
             this.getKey("scores", roomId),
             this.getKey(`answers:${roomId}`, "*"),
         ];

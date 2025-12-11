@@ -6,6 +6,8 @@ import AlgoJwt from "~/utils/jwt";
 
 export const auth = async (req: Request, res: Response, next: NextFunction) => {
     const token = req.cookies.access_token;
+    console.log("jwt", token);
+
 
     if (!token) {
         return res.status(HTTP_STATUS.UNAUTHORIZED).json({

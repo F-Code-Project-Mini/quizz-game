@@ -18,6 +18,7 @@ interface GameLeaderboardProps {
     totalQuestions?: number;
     onNext?: () => void;
     onEnd?: () => void;
+    onReset?: () => void;
     isHost?: boolean;
 }
 
@@ -27,6 +28,7 @@ const GameLeaderboard = ({
     totalQuestions,
     onNext,
     onEnd,
+    onReset,
     isHost = false,
 }: GameLeaderboardProps) => {
     const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
@@ -142,6 +144,14 @@ const GameLeaderboard = ({
                                 className="rounded-xl bg-gradient-to-r from-red-500 to-red-700 px-8 py-4 text-xl font-black text-white shadow-xl transition-all hover:scale-105"
                             >
                                 Kết thúc
+                            </button>
+                        )}
+                        {onReset && (
+                            <button
+                                onClick={onReset}
+                                className="rounded-xl bg-gradient-to-r from-blue-500 to-blue-700 px-8 py-4 text-xl font-black text-white shadow-xl transition-all hover:scale-105"
+                            >
+                                🔄 Chơi lại
                             </button>
                         )}
                     </motion.div>

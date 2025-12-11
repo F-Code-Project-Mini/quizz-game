@@ -4,6 +4,8 @@ import { Circle, Square, Triangle, Star, Trophy } from "lucide-react";
 import { socket } from "~/configs/socket";
 import Swal from "sweetalert2";
 import AnswerFeedback from "~/components/AnswerFeedback";
+import GameCountdown from "~/components/GameCountdown";
+import GameLeaderboard from "~/components/GameLeaderboard";
 
 const answerShapes = [
     {
@@ -49,6 +51,10 @@ const RunningPage = () => {
     const [totalQuestions, setTotalQuestions] = useState(0);
     const [timeLeft, setTimeLeft] = useState(0);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+    const [showCountdown, setShowCountdown] = useState(false);
+    const [showLeaderboard, setShowLeaderboard] = useState(false);
+    const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
+    const [questionStartedAt, setQuestionStartedAt] = useState<string | null>(null);
 
     const playerInfo = localStorage.getItem("player") ? JSON.parse(localStorage.getItem("player")!) : null;
     const roomInfo = localStorage.getItem("room") ? JSON.parse(localStorage.getItem("room")!) : null;
@@ -72,38 +78,62 @@ const RunningPage = () => {
             setCurrentQuestion(data.question);
             setQuestionIndex(data.currentQuestionIndex);
             setTotalQuestions(data.totalQuestions);
-            setTimeLeft(data.question.timeQuestion);
+            setQuestionStartedAt(data.questionStartedAt);
+            
+            // Calculate remaining time based on server timestamp (same as game_started and next_question)
+            const serverTime = new Date(data.questionStartedAt).getTime();
+            const now = new Date().getTime();
+            const elapsed = Math.floor((now - serverTime) / 1000);
+            setTimeLeft(Math.max(0, data.question.timeQuestion - elapsed));
+            
             setHasAnswered(false);
             setSelectedAnswer(null);
             setIsCorrect(null);
+        });
+
+        socket.on("start_countdown", () => {
+            console.log("start_countdown received");
+            setShowCountdown(true);
         });
 
         socket.on("game_started", (data) => {
             console.log("game_started received", data);
+            setShowCountdown(false);
             setCurrentQuestion(data.question);
             setQuestionIndex(data.currentQuestionIndex);
             setTotalQuestions(data.totalQuestions);
-            setTimeLeft(data.question.timeQuestion);
+            setQuestionStartedAt(data.questionStartedAt);
+
+            // Calculate time based on server timestamp
+            const serverTime = new Date(data.questionStartedAt).getTime();
+            const now = new Date().getTime();
+            const elapsed = Math.floor((now - serverTime) / 1000);
+            setTimeLeft(Math.max(0, data.question.timeQuestion - elapsed));
         });
 
         socket.on("next_question", (data) => {
             console.log("next_question received", data);
+            setShowLeaderboard(false);
             setCurrentQuestion(data.question);
             setQuestionIndex(data.currentQuestionIndex);
             setTotalQuestions(data.totalQuestions);
-            setTimeLeft(data.question.timeQuestion);
+            setQuestionStartedAt(data.questionStartedAt);
+            
             setHasAnswered(false);
             setSelectedAnswer(null);
             setIsCorrect(null);
         });
 
+        socket.on("show_leaderboard", (data) => {
+            console.log("show_leaderboard received", data);
+            setLeaderboardData(data.leaderboard);
+            setShowLeaderboard(true);
+        });
+
         socket.on("answer_result", (data) => {
             console.log("answer_result received", data);
-            setIsCorrect(data.isCorrect);
             setScore(data.totalScore);
-            setTimeout(() => {
-                setIsCorrect(null);
-            }, 3000);
+            // Don't show feedback immediately, wait for leaderboard
         });
 
         socket.on("answer_error", (data) => {
@@ -120,33 +150,58 @@ const RunningPage = () => {
             navigate("/result");
         });
 
+        socket.on("room_closed", (data) => {
+            Swal.fire({
+                title: "Phòng đã đóng",
+                text: data.message,
+                icon: "warning",
+                confirmButtonText: "OK",
+            }).then(() => {
+                localStorage.removeItem("player");
+                localStorage.removeItem("room");
+                navigate("/");
+            });
+        });
+
         return () => {
             socket.off("sync_game_state");
+            socket.off("start_countdown");
             socket.off("game_started");
             socket.off("next_question");
+            socket.off("show_leaderboard");
             socket.off("answer_result");
             socket.off("answer_error");
+            socket.off("game_ended");
+            socket.off("room_closed");
             socket.off("game_ended");
         };
     }, []);
 
     useEffect(() => {
-        if (!currentQuestion || hasAnswered) return;
+        if (!currentQuestion || !questionStartedAt || hasAnswered) return;
 
-        setTimeLeft(currentQuestion.timeQuestion);
+        // Calculate remaining time based on server timestamp
+        const calculateTimeLeft = () => {
+            const serverTime = new Date(questionStartedAt).getTime();
+            const now = new Date().getTime();
+            const elapsed = Math.floor((now - serverTime) / 1000);
+            return Math.max(0, currentQuestion.timeQuestion - elapsed);
+        };
 
+        // Update immediately
+        setTimeLeft(calculateTimeLeft());
+
+        // Update every 100ms for smooth countdown
         const timer = setInterval(() => {
-            setTimeLeft((prev) => {
-                if (prev <= 1) {
-                    clearInterval(timer);
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
+            const newTimeLeft = calculateTimeLeft();
+            setTimeLeft(newTimeLeft);
+            if (newTimeLeft === 0) {
+                clearInterval(timer);
+            }
+        }, 100);
 
         return () => clearInterval(timer);
-    }, [currentQuestion, hasAnswered]);
+    }, [currentQuestion, questionStartedAt, hasAnswered]);
 
     const handleAnswerClick = async (answerIndex: number) => {
         if (hasAnswered || !currentQuestion || timeLeft === 0) return;
@@ -177,12 +232,27 @@ const RunningPage = () => {
                     <div className="mb-4 h-16 w-16 mx-auto animate-spin rounded-full border-4 border-white border-t-transparent"></div>
                     <p className="text-2xl font-bold">Đang chờ câu hỏi...</p>
                 </div>
+
+                {showCountdown && <GameCountdown onComplete={() => setShowCountdown(false)} />}
             </div>
+        );
+    }
+
+    // Show leaderboard
+    if (showLeaderboard) {
+        return (
+            <GameLeaderboard
+                players={leaderboardData}
+                currentQuestion={questionIndex + 1}
+                totalQuestions={totalQuestions}
+            />
         );
     }
 
     return (
         <div className="relative min-h-screen overflow-hidden bg-gradient-game">
+            {showCountdown && <GameCountdown onComplete={() => setShowCountdown(false)} />}
+
             <div className="absolute inset-0">
                 <div className="absolute -left-1/4 top-0 h-96 w-96 animate-float rounded-full bg-purple-500/20 blur-3xl"></div>
                 <div
@@ -200,7 +270,11 @@ const RunningPage = () => {
                     </div>
                     <div className="rounded-xl bg-white/90 px-4 py-2 shadow-lg">
                         <p
-                            className={`text-lg font-black ${timeLeft <= 5 ? "text-red-600 animate-pulse" : "text-gray-800"}`}
+                            className={`text-lg font-black ${
+                                timeLeft <= currentQuestion.timeQuestion / 4
+                                    ? "text-red-600 animate-pulse"
+                                    : "text-gray-800"
+                            }`}
                         >
                             {timeLeft}s
                         </p>
@@ -210,11 +284,9 @@ const RunningPage = () => {
                         <p className="text-lg font-black text-purple-600">{score}</p>
                     </div>
                 </div>
-
                 <div className="mb-6 rounded-2xl bg-white/90 p-6 text-center shadow-xl">
                     <p className="text-xl font-bold text-gray-800">Nhìn lên màn hình và chọn đáp án</p>
                 </div>
-
                 <div className="grid flex-1 grid-cols-2 gap-4">
                     {answerShapes.map((shape, index) => (
                         <button
@@ -232,12 +304,10 @@ const RunningPage = () => {
                         </button>
                     ))}
                 </div>
-
+                <p className="text-sm font-bold text-gray-700">{playerInfo?.fullName}</p>
                 <div className="mt-4 rounded-xl bg-white/90 p-3 text-center shadow-lg">
                     <p className="text-sm font-bold text-gray-700">{playerInfo?.fullName}</p>
-                </div>
-
-                <AnswerFeedback isCorrect={isCorrect} score={score} show={isCorrect !== null} />
+                </div>{" "}
             </div>
         </div>
     );

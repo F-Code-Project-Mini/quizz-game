@@ -167,6 +167,62 @@ export const endGameController = async (req: Request<{ roomId: string }>, res: R
     }
 };
 
+export const resetGameController = async (req: Request<{ roomId: string }>, res: Response, next: NextFunction) => {
+    try {
+        const { roomId } = req.params;
+
+        const room = await prisma.room.findUnique({
+            where: { id: roomId },
+            include: {
+                questions: true,
+            },
+        });
+
+        if (!room) {
+            throw new ErrorWithStatus({
+                status: HTTP_STATUS.NOT_FOUND,
+                message: "Phòng không tồn tại",
+            });
+        }
+
+        // Delete all player answers from previous games
+        await prisma.playerAnswer.deleteMany({
+            where: {
+                questionId: {
+                    in: room.questions.map((q) => q.id),
+                },
+            },
+        });
+
+        // Reset all player scores
+        await prisma.player.updateMany({
+            where: { roomId },
+            data: { score: 0 },
+        });
+
+        // Reset room to waiting state
+        const updatedRoom = await prisma.room.update({
+            where: { id: roomId },
+            data: {
+                status: IRoomStatus.WAITING,
+                currentQuestionIndex: 0,
+                startedAt: null,
+            },
+        });
+
+        // Clear cache
+        await RedisCache.clearRoomData(roomId);
+
+        return res.status(HTTP_STATUS.OK).json({
+            success: true,
+            result: updatedRoom,
+            message: "Phòng đã được reset, có thể chơi lại",
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const getRoomStateController = async (req: Request<{ roomId: string }>, res: Response, next: NextFunction) => {
     try {
         const { roomId } = req.params;
