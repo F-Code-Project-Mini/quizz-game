@@ -1,41 +1,19 @@
 import { useState } from "react";
-import type { AxiosError } from "axios";
-import Auth from "~/requests/auth.requests";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { useMutation } from "@tanstack/react-query";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import type { ILoginRequest, ILoginResponse } from "~/types/auth.types";
+import { useAuth } from "~/hooks/useAuth";
+import { LogIn } from "lucide-react";
+
 const LoginPage = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { login } = useAuth();
 
-    const loginMutation = useMutation({
-        mutationFn: ({ username, password }: ILoginRequest) => Auth.login({ username, password }),
-        onSuccess: () => {
-            Swal.fire({
-                title: "Đăng nhập thành công",
-                text: "Bạn đã đăng nhập thành công vào hệ thống.",
-                icon: "success",
-            });
-            navigate("/dashboard");
-        },
-        onError: (error: AxiosError<ILoginResponse>) => {
-            Swal.fire({
-                title: "Đăng nhập thất bại",
-                text: error.response?.data.message || "Đã có lỗi xảy ra trong quá trình đăng nhập.",
-                icon: "error",
-            });
-        },
-        onSettled: () => {
-            setLoading(false);
-        },
-    });
-
-    const handleLogin = (e: any) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!username || !password) {
@@ -44,13 +22,29 @@ const LoginPage = () => {
                 title: "Thiếu thông tin",
                 text: "Vui lòng nhập đầy đủ Tên đăng nhập và Mật khẩu.",
             });
-
             return;
         }
 
         setLoading(true);
 
-        loginMutation.mutate({ username, password });
+        try {
+            await login(username, password);
+            Swal.fire({
+                title: "Đăng nhập thành công",
+                text: "Chào mừng bạn quay trở lại!",
+                icon: "success",
+                timer: 2000,
+            });
+            navigate("/admin");
+        } catch (error: any) {
+            Swal.fire({
+                title: "Đăng nhập thất bại",
+                text: error.message || "Đã có lỗi xảy ra trong quá trình đăng nhập.",
+                icon: "error",
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -124,11 +118,10 @@ const LoginPage = () => {
 
                             <Button
                                 type="submit"
-                                variant="fuchsia"
-                                size="lg"
-                                className="w-full h-11 sm:h-12 bg-gradient-to-r from-purple-600 to-pink-600 text-base sm:text-lg font-bold shadow-glow-pink transition-smooth hover:scale-105 hover:from-purple-700 hover:to-pink-700"
+                                className="w-full h-11 sm:h-12 bg-gradient-to-r from-purple-600 to-pink-600 text-base sm:text-lg font-bold shadow-lg transition-all hover:scale-105 hover:from-purple-700 hover:to-pink-700"
                                 disabled={isLoading}
                             >
+                                <LogIn className="mr-2 h-5 w-5" />
                                 {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
                             </Button>
                         </form>

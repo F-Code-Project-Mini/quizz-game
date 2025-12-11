@@ -42,3 +42,30 @@ export const handleLogin = async (req: Request, res: Response) => {
             .json({ success: false, message: "Đã xảy ra lỗi máy chủ." });
     }
 };
+
+export const handleCheckAuth = async (req: Request, res: Response) => {
+    try {
+        return res.status(HTTP_STATUS.OK).json({
+            success: true,
+        });
+    } catch (error) {
+        return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+            success: false,
+        });
+    }
+};
+
+export const handleLogout = async (req: Request, res: Response) => {
+    try {
+        res.clearCookie("access_token");
+        return res.status(HTTP_STATUS.OK).json({
+            success: true,
+            message: "Đăng xuất thành công!",
+        });
+    } catch (error) {
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: "Đã xảy ra lỗi khi đăng xuất.",
+        });
+    }
+};

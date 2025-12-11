@@ -70,9 +70,12 @@ const WaitPage = () => {
             setPlayers(data);
         });
 
-        // Demo: Bắt đầu countdown sau 5 giây (thực tế sẽ lắng nghe event từ socket)
-        socket.on("start_game", () => {
-            setShowCountdown(true);
+        socket.on("game_started", () => {
+            navigate("/running");
+        });
+
+        socket.on("sync_game_state", () => {
+            navigate("/running");
         });
 
         socket.emit("join_game", {
@@ -85,7 +88,8 @@ const WaitPage = () => {
             socket.off("connect", handleConnect);
             socket.off("disconnect", handleDisconnect);
             socket.off(`update_participants_${info?.club.id}`);
-            socket.off("start_game");
+            socket.off("game_started");
+            socket.off("sync_game_state");
         };
     }, []);
 
