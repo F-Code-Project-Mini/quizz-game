@@ -80,7 +80,7 @@ const LoginPage = () => {
                     <h1 className="mb-2 text-3xl sm:text-4xl md:text-5xl font-black text-white drop-shadow-lg">
                         Đăng nhập
                     </h1>
-                    <p className="text-base sm:text-lg md:text-xl font-semibold text-white/90">🔐 Quản lý Quiz Game</p>
+                    <p className="text-base sm:text-lg md:text-xl font-semibold text-white/90">Quản lý Quiz Game</p>
                 </div>
 
                 {/* Login Card */}

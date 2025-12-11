@@ -3,7 +3,7 @@ import prisma from "~/configs/prisma";
 import bcrypt from "bcrypt";
 import AlgoJwt from "~/utils/jwt";
 import { HTTP_STATUS } from "~/constants/httpStatus";
-import { ExpiresInTokenType } from "~/constants/enums";
+import { ExpiresInTokenType, TokenType } from "~/constants/enums";
 
 export const handleLogin = async (req: Request, res: Response) => {
     const { username, password } = req.body;
@@ -25,7 +25,9 @@ export const handleLogin = async (req: Request, res: Response) => {
             });
         }
 
-        const token = await AlgoJwt.signToken({ payload: { userId: user.id, username: user.username } });
+        const token = await AlgoJwt.signToken({
+            payload: { userId: user.id, username: user.username, type: TokenType.AccessToken },
+        });
 
         res.cookie("access_token", token, { httpOnly: true, secure: true, maxAge: ExpiresInTokenType.AccessToken });
 

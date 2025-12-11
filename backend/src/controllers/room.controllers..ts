@@ -73,3 +73,17 @@ export const handleJoinRoom = async (
         next(error);
     }
 };
+export const handleListRoom = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const rooms = await prisma.room.findMany({
+            where: {},
+            orderBy: { createdAt: "desc" },
+        });
+        return res.status(HTTP_STATUS.OK).json({
+            success: true,
+            result: rooms,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
